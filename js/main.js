@@ -90,9 +90,68 @@ custom = function(){
       $(this).addClass('hide')
     })
   }
-  
+  forms = function(){
+    $('input[type="file"]').change(function(){
+      var value = $("input[type='file']").val(),
+          size = this.files[0].size,
+          pos = -1,
+          index = 0;
+      while ((pos = value.indexOf('\\', pos + 1)) != -1) {
+          index = pos;
+      }
+      value = value.slice(index+1, value.length)
+      text = value+'<span class="size">'+Math.round((size/1024/1024*1000))/1000+'mB</span>'
+      $(this).parent().find('label').html(text);
+      $(this).parent().addClass('load')
+    });
+    $(document).on('submit','.contacts form',function(e){
+      e.preventDefault()
+      var name = $(this).find('input[name=name]'),
+      phone = $(this).find('input[name=phone]'),
+      mail = $(this).find('input[name=mail]'),
+      text = $(this).find('textarea[name=text]'),
+      file = $(this).find('input[name=file]'),
+      pp = $(this).find('input[name=pp]:checked').length,
+      error = 0;
+      $(this).find('input,textarea').parent().removeClass('error')
+
+      if(mail.val() == "" || !mail_right(mail.val())){
+        error++
+        mail.parent().addClass('error')
+      }
+      if(name.val() == ""){
+        error++
+        name.parent().addClass('error')
+      }
+      if(phone.val() == ""){
+        error++
+        phone.parent().addClass('error')
+      }
+      if(text.val() == ""){
+        error++
+        text.parent().addClass('error')
+      }
+      if(pp==0){
+        error++
+        $(this).find('input[name=pp]').parent().addClass('error')
+      }
+      if(error==0){
+        
+      }else{
+        return false;
+      }
+    })
+  }
+  function mail_right(email) {
+    var pattern  = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return pattern .test(String(email).toLowerCase());
+  }
   drop_down_init();
   short_text();
+  forms();
+  if(('input[name=phone]').length>0){
+    $('input[name=phone]').mask("+7 (999) 99-99-999");
+  }
 };
 sliders = function(){
   sliders_init = function(){
