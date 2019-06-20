@@ -1,6 +1,7 @@
 $(document).ready(function(){
   custom();
   sliders();
+  animate();
 })
 custom = function(){
   short_text = function(){
@@ -101,6 +102,7 @@ custom = function(){
       }
       value = value.slice(index+1, value.length)
       text = value+'<span class="size">'+Math.round((size/1024/1024*1000))/1000+'mB</span>'
+
       $(this).parent().find('label').html(text);
       $(this).parent().addClass('load')
     });
@@ -189,4 +191,28 @@ sliders = function(){
   sliders_init_callback();
   sliders_init();
   sliders_post();
+}
+animate = function(){
+  paralax_polygon = function(){
+    $('.figure').each(function(){
+      speed = parseInt(Math.random()*25+45)
+      $(this).attr('start-scroll','null')
+      $(this).attr('data-speed',speed)
+    })
+    $(document).on('scroll',function(){
+      $('.figure').each(function(){
+        if($(this).offset().top<$(document).scrollTop()+$(window).height() && $(this).offset().top+$(this).height()>$(document).scrollTop()){
+          if($(this).attr('start-scroll')=='null'){
+            $(this).attr('start-scroll',$(document).scrollTop())
+            $(this).attr('dirtection',Math.random()>0.5 ? -1:1)
+
+          }
+          var top = ($(this).data('speed')/100*($(document).scrollTop()-$(this).attr('start-scroll')))
+          $(this).css('transform','translate(0,'+top+'px) rotate('+(180*top/5000)*$(this).attr('dirtection')+'deg)')
+          console.log(top)
+        }
+      })
+    })
+  }
+  paralax_polygon()
 }

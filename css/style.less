@@ -51,7 +51,7 @@ body{
       .logo{
         width: 149px;
         height: 105px;
-        background-image: url(../images/logo.png);
+        background-image: url(../images/logo.svg);
         background-repeat: no-repeat;
         background-size: contain;
         cursor: pointer;
@@ -214,7 +214,7 @@ body{
         justify-content: center;
         align-items: flex-start;
         position: relative;
-        background-image: url(../images/main_big_fig.png);
+        background-image: url(../images/main_big_fig.svg);
         background-repeat: no-repeat;
         background-size: auto 130%;
         background-position: center 73px;
@@ -263,10 +263,15 @@ body{
             }
           }
           &::before{
-            content: url('../images/download.png');
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            content: '';
+            background-image: url(../images/download.svg);
+            background-size: contain;
+            background-repeat: no-repeat;
             transition: @anim;
             margin-right: 9px;
-            height: 20px;
           }
           span{
             margin-left: 8px;
@@ -336,7 +341,9 @@ body{
                 display: block;
                 width: 20px;
                 height: 18px;
-                background-image: url(../images/home.png);
+                background-image: url(../images/home.svg);
+                background-size: contain;
+                background-repeat: no-repeat;
               }
             }
             display: flex;
@@ -644,7 +651,7 @@ body{
                 z-index: 3;
                 transform: translate(-50%,-50%);
                 width: 28px;
-                background-image: url(../images/str.png);
+                background-image: url(../images/str_right.svg);
                 background-repeat: no-repeat;
                 background-size: contain;
                 background-position: center;
@@ -1076,14 +1083,14 @@ body{
             &:nth-child(1){
               a{
                 &:before{
-                  background-image: url(../images/fb.png);
+                  background-image: url(../images/fb.svg);
                 }
               }
             }
             &:nth-child(2){
               a{
                 &:before{
-                  background-image: url(../images/vk.png);
+                  background-image: url(../images/vk.svg);
                 }
               }
             }
@@ -1097,7 +1104,7 @@ body{
             &:nth-child(4){
               a{
                 &:before{
-                  background-image: url(../images/in.png);
+                  background-image: url(../images/in.svg);
                 }
               }
             }
@@ -1220,7 +1227,7 @@ body{
               height: 50px;
               position: absolute;
               bottom: -10px;
-              background-image: url(../images/reviews.png);
+              background-image: url(../images/reviews.svg);
               background-size: contain;
               background-repeat: no-repeat;
               right: 50px;
@@ -1319,21 +1326,21 @@ body{
                   &:nth-child(1){
                     a{
                       &:before{
-                        background-image: url(../images/fb.png);
+                        background-image: url(../images/fb.svg);
                       }
                     }
                   }
                   &:nth-child(2){
                     a{
                       &:before{
-                        background-image: url(../images/inst.png);
+                        background-image: url(../images/inst.svg);
                       }
                     }
                   }
                   &:nth-child(3){
                     a{
                       &:before{
-                        background-image: url(../images/vk.png);
+                        background-image: url(../images/vk.svg);
                       }
                     }
                   }
@@ -1386,7 +1393,7 @@ body{
               display: block;
               width: 20px;
               height: 20px;
-              background-image: url(../images/download.png);
+              background-image: url(../images/download.svg);
               background-size: contain;
               background-repeat: no-repeat;
               margin-right: 10px;
@@ -1480,7 +1487,7 @@ body{
                         transition: @anim;
                         width: 33px;
                         height: 16px;
-                        background-image: url(../images/paperclip.png);
+                        background-image: url(../images/paperclip.svg);
                         background-size: contain;
                         background-repeat: no-repeat;
                       }
@@ -1559,7 +1566,7 @@ body{
                     height: 8px;
                     opacity: 0;
                     transition: @anim;
-                    background-image: url(../images/check.png);
+                    background-image: url(../images/check.svg);
                     background-size: contain;
                     background-repeat: no-repeat;
                     top:50%;
@@ -1653,7 +1660,7 @@ body{
             display: block;
             width: 14px;
             height: 10px;
-            background-image: url(../images/str_right.png);
+            background-image: url(../images/str_right.svg);
             background-size: contain;
             background-repeat: no-repeat;
             position: absolute;
@@ -1724,11 +1731,14 @@ body{
         }
       }
       &:before{
-        content: url('../images/points.png');
+        content: '';
         position: absolute;
         top: 50%;
         left: 0;
         transform: translate(0,-50%);
+        background-image: url('../images/points.svg');
+        background-size: contain;
+        background-repeat: no-repeat;
         display: block;
         width: 16px;
         height: 18px;
@@ -1936,8 +1946,13 @@ body{
                 
                 &:before{
                   margin-right: 10px;
-                  margin-top: 4px;
-                  content: url(../images/download.png);
+                  display: inline-block;
+                  width: 20px;
+                  height: 20px;
+                  content: '';
+                  background-image: url(../images/download.svg);
+                  background-size: contain;
+                  background-repeat: no-repeat;
                 }
               }
             }
@@ -2060,8 +2075,14 @@ body{
     z-index: -1;
   }
   &:after{
-    content: url(../images/str_right.png);
+    content: '';
+    background-image: url(../images/str_right.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
     margin-left: 10px;
+    display: inline-block;
+    width: 14px;
+    height: 10px;
   }
   &:hover{
     &:before{
@@ -2072,7 +2093,7 @@ body{
 .polygon{
   background-repeat: no-repeat;
   background-size: contain;
-  background-image: url(../images/polygon.png);
+  background-image: url(../images/polygon.svg);
   width: 176px;
   height: 202px;
   &.size_2{
