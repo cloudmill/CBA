@@ -121,6 +121,7 @@ body{
     &.first_section{
       height: 500px;
       position: relative;
+      z-index: 0;
       &.main{
         height: 100vh;
         .content{
@@ -166,6 +167,10 @@ body{
             margin-left: 0;
           }
         }
+      }
+      #container{
+        position: absolute;
+        z-index: -1;
       }
       .figure{
         position: absolute;
@@ -214,10 +219,10 @@ body{
         justify-content: center;
         align-items: flex-start;
         position: relative;
-        background-image: url(../images/main_big_fig.svg);
+        /* background-image: url(../images/main_big_fig.svg);
         background-repeat: no-repeat;
         background-size: auto 130%;
-        background-position: center 73px;
+        background-position: center 73px; */
         p.title{
           .narrow;
           color: #2f2f2f;

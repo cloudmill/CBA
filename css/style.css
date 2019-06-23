@@ -171,6 +171,7 @@ body {
 .wrapper section.first_section {
   height: 500px;
   position: relative;
+  z-index: 0;
 }
 .wrapper section.first_section.main {
   height: 100vh;
@@ -291,6 +292,10 @@ body {
 .wrapper section.first_section.not_found .content p.title {
   text-align: center;
   margin-left: 0;
+}
+.wrapper section.first_section #container {
+  position: absolute;
+  z-index: -1;
 }
 .wrapper section.first_section .figure {
   position: absolute;
@@ -458,10 +463,10 @@ body {
   justify-content: center;
   align-items: flex-start;
   position: relative;
-  background-image: url(../images/main_big_fig.svg);
-  background-repeat: no-repeat;
-  background-size: auto 130%;
-  background-position: center 73px;
+  /* background-image: url(../images/main_big_fig.svg);
+        background-repeat: no-repeat;
+        background-size: auto 130%;
+        background-position: center 73px; */
 }
 .wrapper section.first_section .content p.title {
   margin-left: 200px;
