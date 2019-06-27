@@ -166,6 +166,13 @@ sliders = function () {
       infinite: true,
       dots: true,
       fade: true,
+    });
+    $('.ambassador-achievement .slider').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      infinite: true,
+      fade: true,
     })
     $('.project-slider .slider').slick({
       slidesToShow: 1,
@@ -174,14 +181,45 @@ sliders = function () {
       infinite: true,
       fade: true,
     })
+    $('.project-recomendation .left .slider').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      vertical: true,
+      verticalSwiping: true,
+      infinite: false
+    })
+    $('.project-recomendation .right .slider').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      swipe: false,
+      vertical: true,
+      infinite: false
+    })
   }
   sliders_init_callback = function () {
     $('.brends .slider').on('init', function () {
       var i = 0;
       $('.brends .slider .slick-slide').each(function () {
         item = $(this).find('.item .text p.one')
-        if (!$(this).hasClass('slick-clone')) {
+        if (!$(this).hasClass('slick-cloned')) {
           $('.brends .slider').find('.slick-dots button').eq(i).html(item.text())
+          i++;
+        }
+      })
+    })
+    $('.project-recomendation .left .slider').on('init', function () {
+      var i = 0;
+      $('.project-recomendation .left .slider .slick-slide').each(function () {
+        if (/* !$(this).hasClass('slick-cloned') */1) {
+          if(i==0){
+            $(this).find('.item').addClass('current')
+          }else if(i==1){
+            $(this).find('.item').addClass('next')
+          }else if(1==2){
+            $(this).find('.item').addClass('next-next')
+          }
           i++;
         }
       })
@@ -189,12 +227,65 @@ sliders = function () {
 
   }
   sliders_post = function () {
-    $('.brends .slider,.project-slider .slider').on('afterChange', function (event, slick, currentSlide, nextSlide) {
-
-      $('.brends .slider,.project-slider .slider').find('.item').eq(currentSlide).addClass('current');
+    var sliders = [//для анимации переключения
+      $('.brends .slider'),
+      $('.project-slider .slider'),
+      $('.ambassador-achievement .slider')
+    ]
+    sliders.forEach(function(item){
+      item.on('afterChange', function (event, slick, currentSlide, nextSlide) {
+        item.find('.item').eq(currentSlide).addClass('current');
+      })
+      item.on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+        item.find('.item').removeClass('current');
+      })
     })
-    $('.brends .slider,.project-slider .slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
-      $('.brends .slider,.project-slider .slider').find('.item').removeClass('current');
+    $('.project-recomendation .left .slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+      $('.project-recomendation .right .slider').slick('slickGoTo',nextSlide)
+      $('.project-recomendation .left .slider').find('.item')
+     
+      .removeClass('current')
+      .removeClass('pre')
+      .removeClass('pre-pre')
+      .removeClass('next')
+      .removeClass('next-next');
+      var cur,next,next_next,pre,pre_pre;
+      cur = nextSlide
+      pre = cur-1
+      pre_pre = cur-2
+      next = cur+1
+      next_next = cur+2
+      if(nextSlide == 0){
+        pre = slick.slideCount-1
+        pre_pre = slick.slideCount-2
+      }
+      if(nextSlide == 1){
+        pre_pre = slick.slideCount-1
+      }
+      if(nextSlide == slick.slideCount-1){
+        next = 0
+        next_next = 1
+      }
+      if(nextSlide == slick.slideCount-2){
+        next_next = 0
+      }
+      var i = 0;
+      $('.project-recomendation .left .slider .slick-slide').each(function () {
+        if (1/* !$(this).hasClass('slick-cloned') */) {
+          if(i==pre_pre){
+            $(this).find('.item').addClass('pre-pre')
+          }else if(i==pre){
+            $(this).find('.item').addClass('pre')
+          }else if(i==cur){
+            $(this).find('.item').addClass('current')
+          }else if(i==next){
+            $(this).find('.item').addClass('next')
+          }else if(i==next_next){
+            $(this).find('.item').addClass('next-next')
+          }
+          i++;
+        }
+      })
     })
   }
   sliders_init_callback();
@@ -208,26 +299,23 @@ animate = function () {
 
     canvasBody.width = $('.graph').width();
     canvasBody.height = (30+$('.graph ul.rows').height());
-    console.log(30+$('.graph ul.rows').height())
     $('.graph').append(canvasBody)
     $('.graph canvas').attr('id','graph')
     var canvasBody = document.getElementById('graph'),
     canvas = canvasBody.getContext("2d"),
-    data = [
-      [0,50],
-      [1,125],
-      [2,700],
-      [3,1600],
-      [4,600],
-      [5,100],
-      [6,2000],
-      [7,200],
-      [8,800],
-    ],
-    max_value = 2000,
-    min_value = 0,
-    
-
+    data = [];
+    $('.data-ar input').each(function(){
+      data.push(parseFloat($(this).val()))
+    })
+    var max_value = $('.data-ar').data('max') ?  $('.data-ar').data('max') : data[0],
+    min_value = $('.data-ar').data('min')<data[0] ? $('.data-ar').data('min') : data[0];
+    for(i=0;i<data.length;i++){
+      if(data[i]>max_value)
+        max_value = data[i]
+      if(data[i]<min_value)
+      min_value = data[i]
+    };
+    var
     w = $('#graph').width(),
     h = $('#graph').height(),
     x_c=-100,y_c=-100,
@@ -291,11 +379,11 @@ animate = function () {
       canvas.fillStyle = gradient;
       canvas.fill();
       
-    }
+    };
     function setup(){
       for(i=0;i<data.length;i++){
-          var x = data[i][0]*((w-correct_left)/data.length)+correct_left,
-          y = h-20-data[i][1]*((h-correct_bot*2-20)/(max_value-min_value))-correct_bot;
+          var x = i*((w)/data.length)+correct_left,
+          y = h-20-(data[i]-min_value)*((h-correct_bot*2-20)/(max_value-min_value))-correct_bot;
           particles.push(new particle(x,y));
       }
       window.requestAnimationFrame(loop);
@@ -330,7 +418,6 @@ animate = function () {
     $(document).on('mousemove','canvas',function(e){
       x_c = e.clientX - $(this).offset().left 
       y_c = e.clientY - $(this).offset().top+ $(document).scrollTop()
-      console.log(x_c,y_c)
     })
     setup();
   }
