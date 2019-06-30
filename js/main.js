@@ -181,6 +181,20 @@ sliders = function () {
       infinite: true,
       fade: true,
     })
+    $('.about-podhod .slider').slick({
+      slidesToShow: 2,
+      slidesToScroll: 1,
+      speed: 1000,
+      arrows: false,
+      infinite: false,
+    })
+    $('.about-advantage .slider').slick({
+      slidesToShow: 2,
+      slidesToScroll: 1,
+      speed: 1000,
+      arrows: false,
+      infinite: false,
+    })
     $('.project-recomendation .left .slider').slick({
       slidesToShow: 1,
       slidesToScroll: 1,
