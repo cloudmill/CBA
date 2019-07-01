@@ -4,7 +4,7 @@ $(document).ready(function () {
   animate();
 })
 custom = function () {
-  
+
   short_text = function () {
     $('.cases .item').each(function () {
       var text_temp = $(this).find('p.two').text(),
@@ -149,10 +149,41 @@ custom = function () {
     var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return pattern.test(String(email).toLowerCase());
   }
+  questions_open = function () {
+    $('.license-quest .block .item.active').each(function () {
+      var item = $(this);
+      var height_temp = item.find('.head').height()
+        + parseFloat(item.find('.head').css('padding-top').replace('px', ''))
+        + parseFloat(item.find('.head').css('padding-bottom').replace('px', ''))
+        + item.find('.text').height()
+        + parseFloat(item.find('.text').css('padding-top').replace('px', ''))
+        + parseFloat(item.find('.text').css('padding-bottom').replace('px', ''));
+      item.css('height', height_temp)
+    })
+    $('.license-quest .block .item').each(function () {
+      var item = $(this);
+      item.find('.close').click(function () {
+        if (item.hasClass('active')) {
+          item.removeClass('active')
+          item.attr('style', '')
+        } else {
+          item.addClass('active')
+          var height_temp = item.find('.head').height()
+            + parseFloat(item.find('.head').css('padding-top').replace('px', ''))
+            + parseFloat(item.find('.head').css('padding-bottom').replace('px', ''))
+            + item.find('.text').height()
+            + parseFloat(item.find('.text').css('padding-top').replace('px', ''))
+            + parseFloat(item.find('.text').css('padding-bottom').replace('px', ''));
+          item.css('height', height_temp)
+        }
+      })
+    })
+  }
+  questions_open();
   drop_down_init();
   short_text();
   forms();
-  
+
   if (('input[name=phone]').length > 0) {
     $('input[name=phone]').mask("+7 (999) 99-99-999");
   }
@@ -211,6 +242,21 @@ sliders = function () {
       vertical: true,
       infinite: false
     })
+    $('.license-opportun .slider.one').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      infinite: false,
+      arrows: false
+    })
+    $('.license-opportun .slider.two').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      swipe: false,
+      infinite: false,
+      arrows: false
+    })
   }
   sliders_init_callback = function () {
     $('.brends .slider').on('init', function () {
@@ -227,11 +273,11 @@ sliders = function () {
       var i = 0;
       $('.project-recomendation .left .slider .slick-slide').each(function () {
         if (/* !$(this).hasClass('slick-cloned') */1) {
-          if(i==0){
+          if (i == 0) {
             $(this).find('.item').addClass('current')
-          }else if(i==1){
+          } else if (i == 1) {
             $(this).find('.item').addClass('next')
-          }else if(1==2){
+          } else if (1 == 2) {
             $(this).find('.item').addClass('next-next')
           }
           i++;
@@ -246,7 +292,7 @@ sliders = function () {
       $('.project-slider .slider'),
       $('.ambassador-achievement .slider')
     ]
-    sliders.forEach(function(item){
+    sliders.forEach(function (item) {
       item.on('afterChange', function (event, slick, currentSlide, nextSlide) {
         item.find('.item').eq(currentSlide).addClass('current');
       })
@@ -254,47 +300,52 @@ sliders = function () {
         item.find('.item').removeClass('current');
       })
     })
+
+    $('.license-opportun .slider.one').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+      $('.license-opportun .slider.two').slick('slickGoTo', nextSlide)
+    })
+
     $('.project-recomendation .left .slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
-      $('.project-recomendation .right .slider').slick('slickGoTo',nextSlide)
+      $('.project-recomendation .right .slider').slick('slickGoTo', nextSlide)
       $('.project-recomendation .left .slider').find('.item')
-     
-      .removeClass('current')
-      .removeClass('pre')
-      .removeClass('pre-pre')
-      .removeClass('next')
-      .removeClass('next-next');
-      var cur,next,next_next,pre,pre_pre;
+
+        .removeClass('current')
+        .removeClass('pre')
+        .removeClass('pre-pre')
+        .removeClass('next')
+        .removeClass('next-next');
+      var cur, next, next_next, pre, pre_pre;
       cur = nextSlide
-      pre = cur-1
-      pre_pre = cur-2
-      next = cur+1
-      next_next = cur+2
-      if(nextSlide == 0){
-        pre = slick.slideCount-1
-        pre_pre = slick.slideCount-2
+      pre = cur - 1
+      pre_pre = cur - 2
+      next = cur + 1
+      next_next = cur + 2
+      if (nextSlide == 0) {
+        pre = slick.slideCount - 1
+        pre_pre = slick.slideCount - 2
       }
-      if(nextSlide == 1){
-        pre_pre = slick.slideCount-1
+      if (nextSlide == 1) {
+        pre_pre = slick.slideCount - 1
       }
-      if(nextSlide == slick.slideCount-1){
+      if (nextSlide == slick.slideCount - 1) {
         next = 0
         next_next = 1
       }
-      if(nextSlide == slick.slideCount-2){
+      if (nextSlide == slick.slideCount - 2) {
         next_next = 0
       }
       var i = 0;
       $('.project-recomendation .left .slider .slick-slide').each(function () {
         if (1/* !$(this).hasClass('slick-cloned') */) {
-          if(i==pre_pre){
+          if (i == pre_pre) {
             $(this).find('.item').addClass('pre-pre')
-          }else if(i==pre){
+          } else if (i == pre) {
             $(this).find('.item').addClass('pre')
-          }else if(i==cur){
+          } else if (i == cur) {
             $(this).find('.item').addClass('current')
-          }else if(i==next){
+          } else if (i == next) {
             $(this).find('.item').addClass('next')
-          }else if(i==next_next){
+          } else if (i == next_next) {
             $(this).find('.item').addClass('next-next')
           }
           i++;
@@ -307,34 +358,34 @@ sliders = function () {
   sliders_post();
 }
 animate = function () {
-  graph = function(){
+  graph = function () {
     $('#graph').width($('#graph').parent().width())
     var canvasBody = document.createElement('canvas');
 
     canvasBody.width = $('.graph').width();
-    canvasBody.height = (30+$('.graph ul.rows').height());
+    canvasBody.height = (30 + $('.graph ul.rows').height());
     $('.graph').append(canvasBody)
-    $('.graph canvas').attr('id','graph')
+    $('.graph canvas').attr('id', 'graph')
     var canvasBody = document.getElementById('graph'),
-    canvas = canvasBody.getContext("2d"),
-    data = [];
-    $('.data-ar input').each(function(){
+      canvas = canvasBody.getContext("2d"),
+      data = [];
+    $('.data-ar input').each(function () {
       data.push(parseFloat($(this).val()))
     })
-    var max_value = $('.data-ar').data('max') ?  $('.data-ar').data('max') : data[0],
-    min_value = $('.data-ar').data('min')<data[0] ? $('.data-ar').data('min') : data[0];
-    for(i=0;i<data.length;i++){
-      if(data[i]>max_value)
+    var max_value = $('.data-ar').data('max') ? $('.data-ar').data('max') : data[0],
+      min_value = $('.data-ar').data('min') < data[0] ? $('.data-ar').data('min') : data[0];
+    for (i = 0; i < data.length; i++) {
+      if (data[i] > max_value)
         max_value = data[i]
-      if(data[i]<min_value)
-      min_value = data[i]
+      if (data[i] < min_value)
+        min_value = data[i]
     };
     var
-    w = $('#graph').width(),
-    h = $('#graph').height(),
-    x_c=-100,y_c=-100,
-    opts = {
-        object:{
+      w = $('#graph').width(),
+      h = $('#graph').height(),
+      x_c = -100, y_c = -100,
+      opts = {
+        object: {
           radius_big: 15,
           opacity_big: 0.2,
           radius_small: 4.5,
@@ -344,94 +395,94 @@ animate = function () {
           step: 1,
           background: 'linear-gradient(to top,  0%, rgba(69, 227, 241, 0) 1%,  100%)',
         },
-        canvas:{
-            bgc: "#fff",
+        canvas: {
+          bgc: "#fff",
         }
-    },
-    correct_left = 100,
-    correct_bot = opts.object.radius_big,
+      },
+      correct_left = 100,
+      correct_bot = opts.object.radius_big,
 
-    particles = [],
-    particle = function(x,y){
-      this.x = x;
-      this.y = y;
-      this.draw_small = function(){
+      particles = [],
+      particle = function (x, y) {
+        this.x = x;
+        this.y = y;
+        this.draw_small = function () {
+          canvas.beginPath();
+          canvas.arc(this.x, this.y, opts.object.radius_small, 0, Math.PI * 2)
+          canvas.closePath();
+          canvas.fillStyle = opts.object.color;
+          canvas.fill();
+        }
+        this.draw_big = function () {
+          canvas.beginPath();
+          canvas.arc(this.x, this.y, opts.object.radius_big, 0, Math.PI * 2)
+          canvas.closePath();
+          canvas.fillStyle = opts.object.color_big;
+          canvas.fill();
+        }
+      },
+      draw_line = function (x1, y1, x2, y2) {
         canvas.beginPath();
-        canvas.arc(this.x,this.y,opts.object.radius_small,0,Math.PI*2)
+        canvas.moveTo(x1, y1);
+        canvas.lineTo(x2, y2);
         canvas.closePath();
-        canvas.fillStyle = opts.object.color;
-        canvas.fill();
-      }
-      this.draw_big = function(){
+        canvas.strokeStyle = opts.object.color;
+        canvas.lineWidth = opts.object.stroke_width;
+        canvas.stroke();
+      },
+      gradient = canvas.createLinearGradient(w / 2, 0, w / 2, h),
+      draw_polugone = function (x1, y1, x2, y2) {
         canvas.beginPath();
-        canvas.arc(this.x,this.y,opts.object.radius_big,0,Math.PI*2)
+        canvas.moveTo(x1, y1);
+        canvas.lineTo(x2, y2);
+        canvas.lineTo(x2, h);
+        canvas.lineTo(x1, h);
         canvas.closePath();
-        canvas.fillStyle = opts.object.color_big;
+
+        gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
+        gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
+        canvas.fillStyle = gradient;
         canvas.fill();
-      }
-    },
-    draw_line = function(x1,y1,x2,y2){
-      canvas.beginPath();
-      canvas.moveTo(x1, y1);
-      canvas.lineTo(x2, y2);
-      canvas.closePath();
-      canvas.strokeStyle = opts.object.color;
-      canvas.lineWidth = opts.object.stroke_width;
-      canvas.stroke();
-    },
-    gradient = canvas.createLinearGradient(w/2, 0, w/2, h),
-    draw_polugone = function(x1,y1,x2,y2){
-      canvas.beginPath();
-      canvas.moveTo(x1, y1);
-      canvas.lineTo(x2, y2);
-      canvas.lineTo(x2, h);
-      canvas.lineTo(x1, h);
-      canvas.closePath();
-      
-      gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
-      gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
-      canvas.fillStyle = gradient;
-      canvas.fill();
-      
-    };
-    function setup(){
-      for(i=0;i<data.length;i++){
-          var x = i*((w)/data.length)+correct_left,
-          y = h-20-(data[i]-min_value)*((h-correct_bot*2-20)/(max_value-min_value))-correct_bot;
-          particles.push(new particle(x,y));
+
+      };
+    function setup() {
+      for (i = 0; i < data.length; i++) {
+        var x = i * ((w) / data.length) + correct_left,
+          y = h - 20 - (data[i] - min_value) * ((h - correct_bot * 2 - 20) / (max_value - min_value)) - correct_bot;
+        particles.push(new particle(x, y));
       }
       window.requestAnimationFrame(loop);
     };
-    function loop(){
-        canvas.fillStyle = opts.canvas.bgc;
-        canvas.fillRect(0,0,w,h);
-        for(i=0;i<particles.length;i++){
-            particles[i].draw_big()
-            particles[i].draw_small();
-            //console.log(particles[i])
-            //particles[i].move()
-        }
-        for(i=1;i<particles.length;i++){
-          draw_line(
-            particles[i].x,particles[i].y,
-            particles[i-1].x,particles[i-1].y
-            )
-          draw_polugone(
-            particles[i].x,particles[i].y,
-            particles[i-1].x,particles[i-1].y
-            )
-        }
-        for(i=0;i<particles.length;i++){
-          draw_line(
-            particles[i].x,particles[i].y,
-            particles[i].x,h
-            )
-        }
-        window.requestAnimationFrame(loop)
+    function loop() {
+      canvas.fillStyle = opts.canvas.bgc;
+      canvas.fillRect(0, 0, w, h);
+      for (i = 0; i < particles.length; i++) {
+        particles[i].draw_big()
+        particles[i].draw_small();
+        //console.log(particles[i])
+        //particles[i].move()
+      }
+      for (i = 1; i < particles.length; i++) {
+        draw_line(
+          particles[i].x, particles[i].y,
+          particles[i - 1].x, particles[i - 1].y
+        )
+        draw_polugone(
+          particles[i].x, particles[i].y,
+          particles[i - 1].x, particles[i - 1].y
+        )
+      }
+      for (i = 0; i < particles.length; i++) {
+        draw_line(
+          particles[i].x, particles[i].y,
+          particles[i].x, h
+        )
+      }
+      window.requestAnimationFrame(loop)
     };
-    $(document).on('mousemove','canvas',function(e){
-      x_c = e.clientX - $(this).offset().left 
-      y_c = e.clientY - $(this).offset().top+ $(document).scrollTop()
+    $(document).on('mousemove', 'canvas', function (e) {
+      x_c = e.clientX - $(this).offset().left
+      y_c = e.clientY - $(this).offset().top + $(document).scrollTop()
     })
     setup();
   }
