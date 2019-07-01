@@ -497,12 +497,88 @@ animate = function () {
         if ($(this).offset().top < $(document).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(document).scrollTop()) {
           if ($(this).attr('start-scroll') == 'null') {
             $(this).attr('start-scroll', $(document).scrollTop())
-            $(this).attr('dirtection', Math.random() > 0.5 ? -1 : 1)
-
+            $(this).attr('direction', Math.random() > 0.5 ? -1 : 1)
           }
           var top = ($(this).data('speed') / 100 * ($(document).scrollTop() - $(this).attr('start-scroll')))
-          $(this).css('transform', 'translate(0,' + top + 'px) rotate(' + (180 * top / 5000) * $(this).attr('dirtection') + 'deg)')
+          $(this).css('transform', 'translate(0,' + top + 'px) rotate(' + (180 * top / 5000) * $(this).attr('direction') + 'deg)')
           console.log(top)
+        }
+      })
+    })
+  }
+  polugone_crush_mouse = function () {
+    var items,
+      opts = {
+        lenght_move: 100,
+      }
+    /* item = function(){
+      this.move_x = 0
+      this.move_y = 0
+      this.left_x = opts.lenght_move
+      this.left_y = opts.lenght_move
+      this.forse_y = 1
+      this.forse_y = 1;
+    } */
+    $('.figure').each(function () {
+      $(this).attr('move-x', 0)
+      $(this).attr('move-y', 0)
+      $(this).attr('left-x', opts.lenght_move)
+      $(this).attr('left-y', opts.lenght_move)
+      $(this).attr('forse-x', 1)
+      $(this).attr('forse-y', 1)
+      $(this).attr('hover', false)
+      /* item_temp = new item()
+      items.push(item_temp) */
+    })
+    pos = function (item) {
+      var
+        x = item.offset().left + item.width() / 2,
+        y = item.offset().top - $(document).scrollTop() + item.height() / 2;
+      return { x: x, y: y }
+    }
+    shorted = function (a, b, l) {
+      return (Math.abs(a - b)) < l
+    }
+    function ticks() {
+      $('.figure').each(function (e) {
+        if ($(this).attr('hover') == 'true') {
+          var transform, d_x, d_y;
+          d_x =
+            parseFloat($(this).attr('move-x'))
+            + parseFloat($(this).attr('dx'))
+            * parseFloat($(this).attr('forse-x'))
+            * parseFloat($(this).attr('left-x'))
+          d_y =
+            parseFloat($(this).attr('move-y'))
+            + parseFloat($(this).attr('dy'))
+            * parseFloat($(this).attr('forse-y'))
+            * parseFloat($(this).attr('left-y'))
+          $(this).attr('move-x', d_x)
+          $(this).attr('move-y', d_y)
+          $(this).attr('left-y', opts.lenght_move-Math.abs(d_y))
+          $(this).attr('left-x', opts.lenght_move-Math.abs(d_x))
+          console.log(d_x)
+          transform = "translate(" + d_x + "px," + d_y + "px)";
+          $(this).css('transform', transform)
+        }
+      })
+    }
+    setInterval(ticks, 50);
+    $(document).on('mousemove', function (e) {
+      var x = e.clientX,
+        y = e.clientY
+      $('.figure').each(function (e) {
+        var pos_temp = pos($(this))
+        if (shorted(pos_temp.y, y, $(this).height() / 2)
+          && shorted(pos_temp.x, x, $(this).width() / 2)) {
+          $(this).css('background-color', 'red')
+          $(this).attr('hover', true)
+          $(this).attr('dY', (pos_temp.y - y)/($(this).height() / 2))
+          $(this).attr('dX', (pos_temp.x - x)/($(this).width() / 2))
+          console.log(pos_temp.y - y)
+        } else {
+          $(this).attr('hover', false)
+          $(this).css('background-color', 'transparent')
         }
       })
     })
@@ -672,7 +748,9 @@ animate = function () {
     setup()
   };
   hex_sphere();
-  graph();
+  if ($('.graph').length > 0)
+    graph();
+  //polugone_crush_mouse();
   //paralax_polygon()
 }
 
