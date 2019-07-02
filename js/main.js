@@ -145,10 +145,7 @@ custom = function () {
       }
     })
   }
-  function mail_right(email) {
-    var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return pattern.test(String(email).toLowerCase());
-  }
+ 
   questions_open = function () {
     $('.license-quest .block .item.active').each(function () {
       var item = $(this);
@@ -186,6 +183,10 @@ custom = function () {
 
   if (('input[name=phone]').length > 0) {
     $('input[name=phone]').mask("+7 (999) 99-99-999");
+  }
+  function mail_right(email) {
+    var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return pattern.test(String(email).toLowerCase());
   }
 };
 sliders = function () {
@@ -506,29 +507,94 @@ animate = function () {
       })
     })
   }
-  polugone_crush_mouse = function () {
-    var items,
+  polugone_move_on_mouse = function () {
+    var items = [],
       opts = {
         lenght_move: 100,
+        k_lenght_fill: 3,
+        start_forse: 4
+      },
+      item = function (obj) {
+        this.move_x = 0
+        this.move_y = 0
+        this.left_x = opts.lenght_move
+        this.left_y = opts.lenght_move
+        this.forse_y = opts.start_forse
+        this.forse_x = opts.start_forse;
+        this.hover = false;
+        this.object = obj;
+        this.dx = 0
+        this.start_begin = false;
+        this.dy = 0
+        this.post_hover = false
       }
-    /* item = function(){
-      this.move_x = 0
-      this.move_y = 0
-      this.left_x = opts.lenght_move
-      this.left_y = opts.lenght_move
-      this.forse_y = 1
-      this.forse_y = 1;
-    } */
     $('.figure').each(function () {
-      $(this).attr('move-x', 0)
-      $(this).attr('move-y', 0)
-      $(this).attr('left-x', opts.lenght_move)
-      $(this).attr('left-y', opts.lenght_move)
-      $(this).attr('forse-x', 1)
-      $(this).attr('forse-y', 1)
-      $(this).attr('hover', false)
-      /* item_temp = new item()
-      items.push(item_temp) */
+      items.push(new item($(this)))
+    })
+    
+    function ticks() {
+      items.forEach(function (item, i) {
+        this.index = i
+        var go_to_back;
+        if (item.hover) {
+          clearTimeout(go_to_back)
+          item.object.css('transition','none');
+          item.start_begin = false;
+          var transform, d_x, d_y;
+          d_x = round(item.move_x
+            + item.dx
+            * item.forse_x
+            * Math.abs(item.dy*0.5),3)
+          d_y = round(item.move_y
+            + item.dy
+            * item.forse_y
+            * Math.abs(item.dx*0.5),3)
+          item.move_x = d_x
+          item.move_y = d_y
+          item.left_x = opts.lenght_move - Math.abs(d_x)
+          item.left_y = opts.lenght_move - Math.abs(d_y)
+          transform = "translate(" + d_x + "px," + d_y + "px)";
+          item.object.css('transform', transform)
+          item.post_hover = true;
+        }else if(!item.start_begin && item.post_hover){
+          item.object.attr('style','')
+          item.object.css('transition','transform 1s');
+          item.object.css('transform','translate(' + 0 + 'px,' + 0 + 'px)');
+          
+          item.left_x = opts.lenght_move
+          item.left_y = opts.lenght_move
+          item.start_begin = true
+          item.post_hover = false
+          go_to_back = setTimeout(() => {
+            if(!item.post_hover){
+              item.object.attr('style','' )
+            }
+          },  (Math.abs(item.move_x*parseInt(item.object.width()))
+          +Math.abs(item.move_y*parseInt(item.object.height()))));
+          console.log(
+            (Math.abs(item.move_x*parseInt(item.object.width()))
+            +Math.abs(item.move_y*parseInt(item.object.height()))))
+          item.move_x = 0
+          item.move_y = 0
+        }
+      })
+    }
+    setInterval(ticks, 1);
+    $(document).on('mousemove', function (e) {
+      var x = e.clientX,
+        y = e.clientY;
+        items.forEach(function (item, i) {
+          var 
+            pos_temp = pos(item.object)
+          if (shorted(pos_temp.y, y, item.object.height() * opts.k_lenght_fill / 2)
+            && shorted(pos_temp.x, x, item.object.width() * opts.k_lenght_fill / 2)) {
+            item.hover = true
+            item.dy = round(1 - Math.abs((pos_temp.y - y) / (item.object.height() * opts.k_lenght_fill / 2)),3)* (pos_temp.y - y < 0 ? -1:1)
+            item.dx = round(1 - Math.abs((pos_temp.x - x) / (item.object.width() * opts.k_lenght_fill / 2)),3)* (pos_temp.x - x < 0 ? -1:1)
+          } else {
+            item.hover = false
+          }
+        })
     })
     pos = function (item) {
       var
@@ -539,49 +605,9 @@ animate = function () {
     shorted = function (a, b, l) {
       return (Math.abs(a - b)) < l
     }
-    function ticks() {
-      $('.figure').each(function (e) {
-        if ($(this).attr('hover') == 'true') {
-          var transform, d_x, d_y;
-          d_x =
-            parseFloat($(this).attr('move-x'))
-            + parseFloat($(this).attr('dx'))
-            * parseFloat($(this).attr('forse-x'))
-            * parseFloat($(this).attr('left-x'))
-          d_y =
-            parseFloat($(this).attr('move-y'))
-            + parseFloat($(this).attr('dy'))
-            * parseFloat($(this).attr('forse-y'))
-            * parseFloat($(this).attr('left-y'))
-          $(this).attr('move-x', d_x)
-          $(this).attr('move-y', d_y)
-          $(this).attr('left-y', opts.lenght_move-Math.abs(d_y))
-          $(this).attr('left-x', opts.lenght_move-Math.abs(d_x))
-          console.log(d_x)
-          transform = "translate(" + d_x + "px," + d_y + "px)";
-          $(this).css('transform', transform)
-        }
-      })
+    round = function(num,step){
+      return parseInt(num*Math.pow(10,step))/Math.pow(10,step)
     }
-    setInterval(ticks, 50);
-    $(document).on('mousemove', function (e) {
-      var x = e.clientX,
-        y = e.clientY
-      $('.figure').each(function (e) {
-        var pos_temp = pos($(this))
-        if (shorted(pos_temp.y, y, $(this).height() / 2)
-          && shorted(pos_temp.x, x, $(this).width() / 2)) {
-          $(this).css('background-color', 'red')
-          $(this).attr('hover', true)
-          $(this).attr('dY', (pos_temp.y - y)/($(this).height() / 2))
-          $(this).attr('dX', (pos_temp.x - x)/($(this).width() / 2))
-          console.log(pos_temp.y - y)
-        } else {
-          $(this).attr('hover', false)
-          $(this).css('background-color', 'transparent')
-        }
-      })
-    })
   }
   hex_sphere = function () {
     var width = $('#container').innerWidth();
@@ -748,9 +774,10 @@ animate = function () {
     setup()
   };
   hex_sphere();
-  if ($('.graph').length > 0)
-    graph();
-  //polugone_crush_mouse();
+  
+  polugone_move_on_mouse();
   //paralax_polygon()
+
+  if ($('.graph').length > 0) graph();
 }
 
