@@ -145,7 +145,7 @@ custom = function () {
       }
     })
   }
- 
+
   questions_open = function () {
     $('.license-quest .block .item.active').each(function () {
       var item = $(this);
@@ -510,30 +510,48 @@ animate = function () {
   polugone_move_on_mouse = function () {
     var items = [],
       pos = {
-        x:0,
-        y:0
+        x: 0,
+        y: 0
       },
       opts = {
         lenght_move: 100,
         k_lenght_fill: 3,
-        start_forse: 4
+        start_forse: 8
       };
     item = function (obj) {
       this.move_x = 0
       this.move_y = 0
+      this.tick_t = 0;
       this.left_x = opts.lenght_move
       this.left_y = opts.lenght_move
       this.forse_y = opts.start_forse
       this.forse_x = opts.start_forse;
-      this.hover = false;
       this.object = obj;
       this.dx = 0
+      this.transform = '';
       this.start_begin = false;
-      this.dy = 0
       this.post_hover = false;
-      this.go_to_back = setTimeout(() => {},1)
+      this.hover = false;
+      this.post_move_free = false;
+      this.dy = 0
+      this.time_go_to_back = 0
+      this.x_old = 0
+      this.y_old = 0
+
+      this.go_to_back = setTimeout(() => { }, 1)
+      this.time_move_next = 30
+      this.move_free = function () {
+        this.transform = "translate(" + this.x_old + "px," + this.y_old + "px)";
+        this.move_x = this.x_old
+        this.move_y = this.y_old
+        this.x_old = (Math.random() - 0.5) * this.forse_x * 3
+        this.y_old = (Math.random() - 0.5) * this.forse_y * 3
+        this.object.css('transform', this.transform)
+        this.object.css('transition', 'transform 4s')
+        this.post_move_free = true;
+      }
     }
-    
+
     pos = function (item) {
       var
         x = item.offset().left + item.width() / 2,
@@ -543,82 +561,97 @@ animate = function () {
     shorted = function (a, b, l) {
       return (Math.abs(a - b)) < l
     }
-    round = function(num,step){
-      return parseInt(num*Math.pow(10,step))/Math.pow(10,step)
+    round = function (num, step) {
+      return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
     }
-
     $('.figure').each(function () {
       items.push(new item($(this)))
     })
-
-    reaction_on_mouse = function(item){
-      var 
+    reaction_on_mouse = function (item) {
+      var
         pos_temp = pos(item.object)
       if (shorted(pos_temp.y, pos.y, item.object.height() * opts.k_lenght_fill / 2)
         && shorted(pos_temp.x, pos.x, item.object.width() * opts.k_lenght_fill / 2)) {
         item.hover = true
-        item.dy = round(1 - Math.abs((pos_temp.y - pos.y) / (item.object.height() * opts.k_lenght_fill / 2)),3)* (pos_temp.y - pos.y < 0 ? -1:1)
-        item.dx = round(1 - Math.abs((pos_temp.x - pos.x) / (item.object.width() * opts.k_lenght_fill / 2)),3)* (pos_temp.x - pos.x < 0 ? -1:1)
+        item.dy = round(1 - Math.abs((pos_temp.y - pos.y) / (item.object.height() * opts.k_lenght_fill / 2)), 3) * (pos_temp.y - pos.y < 0 ? -1 : 1)
+        item.dx = round(1 - Math.abs((pos_temp.x - pos.x) / (item.object.width() * opts.k_lenght_fill / 2)), 3) * (pos_temp.x - pos.x < 0 ? -1 : 1)
       } else {
         item.hover = false
       }
     }
-    fig_move = function(item){
+    fig_move = function (item) {
       clearTimeout(item.go_to_back)
-      item.object.css('transition','none');
-      item.start_begin = false;
-      var transform, d_x, d_y;
+      item.object.css('transition', 'none');
+      var d_x, d_y;
       d_x = round(item.move_x
         + item.dx
         * item.forse_x
-        * Math.abs(item.dy*0.5),3)
+        * Math.abs(item.dy * 0.2), 3)
       d_y = round(item.move_y
         + item.dy
         * item.forse_y
-        * Math.abs(item.dx*0.5),3)
+        * Math.abs(item.dx * 0.2), 3)
       item.move_x = d_x
       item.move_y = d_y
       item.left_x = opts.lenght_move - Math.abs(d_x)
       item.left_y = opts.lenght_move - Math.abs(d_y)
-      transform = "translate(" + d_x + "px," + d_y + "px)";
-      item.object.css('transform', transform)
+      item.transform = "translate(" + d_x + "px," + d_y + "px)";
+      item.object.css('transform', item.transform)
       item.post_hover = true;
     }
-    fig_go_to_back = function(item){
-      item.object.attr('style','')
-      item.object.css('transition','transform 1s');
-      item.object.css('transform','translate(' + 0 + 'px,' + 0 + 'px)');
+    fig_go_to_back = function (item) {
+      item.time_go_to_back = (Math.abs(item.move_x * parseInt(item.object.width()))
+        + Math.abs(item.move_y * parseInt(item.object.height()))) / 7
       
-      item.left_x = opts.lenght_move
-      item.left_y = opts.lenght_move
+      if (item.post_move_free) {
+        item.time_go_to_back = 500
+        item.object.css('transform', 'translate(' + item.move_x + 'px,' + item.move_y + 'px)');
+      }else{
+        item.object.css('transform', 'translate(' + 0 + 'px,' + 0 + 'px)');
+        item.move_x = 0
+        item.move_y = 0
+      }
+      item.object.css('transition', 'transform ' + item.time_go_to_back / 1000 + 's');
+      
       item.start_begin = true
       item.post_hover = false
+      item.post_move_free = false;
       item.go_to_back = setTimeout(() => {
-        if(!item.post_hover){
-          item.object.attr('style','' )
+        if (!item.post_hover) {
+          item.object.css('transition', 'none')
+          item.start_begin = false;
         }
-      },  (Math.abs(item.move_x*parseInt(item.object.width()))
-      +Math.abs(item.move_y*parseInt(item.object.height()))));
-
-      item.move_x = 0
-      item.move_y = 0
+      }, item.time_go_to_back);
+      
+      item.left_x = opts.lenght_move - item.move_x
+      item.left_y = opts.lenght_move - item.move_y
     }
     function ticks() {
       items.forEach(function (item) {
+        item.tick_t++
         reaction_on_mouse(item)
-        if (item.hover) {
-          fig_move(item)
-        }else if(!item.start_begin && item.post_hover){
-          fig_go_to_back(item)
+        if(!item.start_begin){
+          if (item.hover && !item.post_move_free) {
+            fig_move(item)
+          } else if (item.post_hover || (item.post_move_free && item.hover)) {
+            fig_go_to_back(item)
+          }
+          else if (item.tick_t > item.time_move_next) {
+            item.move_free()
+            item.tick_t = 0;
+          }
         }
       })
     }
-    setInterval(ticks, 1);
-    
-    $(document).on('mousemove', function (e) {
-      pos.x = e.clientX,
-      pos.y = e.clientY;
-   })
+    if($(window).width()>768){
+      setInterval(ticks, 1);
+      $(document).on('mousemove', function (e) {
+        pos.x = e.clientX,
+          pos.y = e.clientY;
+      })
+    }else{
+      $('.figure').remove();
+    }
   }
   hex_sphere = function () {
     var width = $('#container').innerWidth();
@@ -628,6 +661,7 @@ animate = function () {
     renderer.setSize(width, height);
     renderer.setClearColor(0xf5f5f5);
     var cameraDistance = 65;
+    if($(window).width()<551)cameraDistance = 70
     var camera = new THREE.PerspectiveCamera(cameraDistance, width / height, 1, 200);
     camera.position.z = -cameraDistance;
 
@@ -657,7 +691,8 @@ animate = function () {
           geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
           var obj = new THREE.Mesh(geometry_sphere, material_sphere);
           obj.position.copy(new THREE.Vector3(bp.x, bp.y, bp.z));
-          scene.add(obj)
+          if($(window).width()>768)
+            scene.add(obj)
         }
         center = function (x1, y1, z1, x2, y2, z2, req, d, l) {
           var xt, yt, zt;
@@ -776,16 +811,16 @@ animate = function () {
 
     }
     function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = $('#container').innerWidth() / $('#container').innerHeight();
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize($('#container').innerWidth(), $('#container').innerHeight());
     }
     $(window).resize(onWindowResize)
     $("#container").append(renderer.domElement);
     setup()
   };
   hex_sphere();
-  
+
   polugone_move_on_mouse();
   //paralax_polygon()
 
