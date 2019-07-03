@@ -509,93 +509,31 @@ animate = function () {
   }
   polugone_move_on_mouse = function () {
     var items = [],
+      pos = {
+        x:0,
+        y:0
+      },
       opts = {
         lenght_move: 100,
         k_lenght_fill: 3,
         start_forse: 4
-      },
-      item = function (obj) {
-        this.move_x = 0
-        this.move_y = 0
-        this.left_x = opts.lenght_move
-        this.left_y = opts.lenght_move
-        this.forse_y = opts.start_forse
-        this.forse_x = opts.start_forse;
-        this.hover = false;
-        this.object = obj;
-        this.dx = 0
-        this.start_begin = false;
-        this.dy = 0
-        this.post_hover = false
-      }
-    $('.figure').each(function () {
-      items.push(new item($(this)))
-    })
-    
-    function ticks() {
-      items.forEach(function (item, i) {
-        this.index = i
-        var go_to_back;
-        if (item.hover) {
-          clearTimeout(go_to_back)
-          item.object.css('transition','none');
-          item.start_begin = false;
-          var transform, d_x, d_y;
-          d_x = round(item.move_x
-            + item.dx
-            * item.forse_x
-            * Math.abs(item.dy*0.5),3)
-          d_y = round(item.move_y
-            + item.dy
-            * item.forse_y
-            * Math.abs(item.dx*0.5),3)
-          item.move_x = d_x
-          item.move_y = d_y
-          item.left_x = opts.lenght_move - Math.abs(d_x)
-          item.left_y = opts.lenght_move - Math.abs(d_y)
-          transform = "translate(" + d_x + "px," + d_y + "px)";
-          item.object.css('transform', transform)
-          item.post_hover = true;
-        }else if(!item.start_begin && item.post_hover){
-          item.object.attr('style','')
-          item.object.css('transition','transform 1s');
-          item.object.css('transform','translate(' + 0 + 'px,' + 0 + 'px)');
-          
-          item.left_x = opts.lenght_move
-          item.left_y = opts.lenght_move
-          item.start_begin = true
-          item.post_hover = false
-          go_to_back = setTimeout(() => {
-            if(!item.post_hover){
-              item.object.attr('style','' )
-            }
-          },  (Math.abs(item.move_x*parseInt(item.object.width()))
-          +Math.abs(item.move_y*parseInt(item.object.height()))));
-          console.log(
-            (Math.abs(item.move_x*parseInt(item.object.width()))
-            +Math.abs(item.move_y*parseInt(item.object.height()))))
-          item.move_x = 0
-          item.move_y = 0
-        }
-      })
+      };
+    item = function (obj) {
+      this.move_x = 0
+      this.move_y = 0
+      this.left_x = opts.lenght_move
+      this.left_y = opts.lenght_move
+      this.forse_y = opts.start_forse
+      this.forse_x = opts.start_forse;
+      this.hover = false;
+      this.object = obj;
+      this.dx = 0
+      this.start_begin = false;
+      this.dy = 0
+      this.post_hover = false;
+      this.go_to_back = setTimeout(() => {},1)
     }
-    setInterval(ticks, 1);
-    $(document).on('mousemove', function (e) {
-      var x = e.clientX,
-        y = e.clientY;
-        items.forEach(function (item, i) {
-          var 
-            pos_temp = pos(item.object)
-          if (shorted(pos_temp.y, y, item.object.height() * opts.k_lenght_fill / 2)
-            && shorted(pos_temp.x, x, item.object.width() * opts.k_lenght_fill / 2)) {
-            item.hover = true
-            item.dy = round(1 - Math.abs((pos_temp.y - y) / (item.object.height() * opts.k_lenght_fill / 2)),3)* (pos_temp.y - y < 0 ? -1:1)
-            item.dx = round(1 - Math.abs((pos_temp.x - x) / (item.object.width() * opts.k_lenght_fill / 2)),3)* (pos_temp.x - x < 0 ? -1:1)
-          } else {
-            item.hover = false
-          }
-        })
-    })
+    
     pos = function (item) {
       var
         x = item.offset().left + item.width() / 2,
@@ -608,6 +546,79 @@ animate = function () {
     round = function(num,step){
       return parseInt(num*Math.pow(10,step))/Math.pow(10,step)
     }
+
+    $('.figure').each(function () {
+      items.push(new item($(this)))
+    })
+
+    reaction_on_mouse = function(item){
+      var 
+        pos_temp = pos(item.object)
+      if (shorted(pos_temp.y, pos.y, item.object.height() * opts.k_lenght_fill / 2)
+        && shorted(pos_temp.x, pos.x, item.object.width() * opts.k_lenght_fill / 2)) {
+        item.hover = true
+        item.dy = round(1 - Math.abs((pos_temp.y - pos.y) / (item.object.height() * opts.k_lenght_fill / 2)),3)* (pos_temp.y - pos.y < 0 ? -1:1)
+        item.dx = round(1 - Math.abs((pos_temp.x - pos.x) / (item.object.width() * opts.k_lenght_fill / 2)),3)* (pos_temp.x - pos.x < 0 ? -1:1)
+      } else {
+        item.hover = false
+      }
+    }
+    fig_move = function(item){
+      clearTimeout(item.go_to_back)
+      item.object.css('transition','none');
+      item.start_begin = false;
+      var transform, d_x, d_y;
+      d_x = round(item.move_x
+        + item.dx
+        * item.forse_x
+        * Math.abs(item.dy*0.5),3)
+      d_y = round(item.move_y
+        + item.dy
+        * item.forse_y
+        * Math.abs(item.dx*0.5),3)
+      item.move_x = d_x
+      item.move_y = d_y
+      item.left_x = opts.lenght_move - Math.abs(d_x)
+      item.left_y = opts.lenght_move - Math.abs(d_y)
+      transform = "translate(" + d_x + "px," + d_y + "px)";
+      item.object.css('transform', transform)
+      item.post_hover = true;
+    }
+    fig_go_to_back = function(item){
+      item.object.attr('style','')
+      item.object.css('transition','transform 1s');
+      item.object.css('transform','translate(' + 0 + 'px,' + 0 + 'px)');
+      
+      item.left_x = opts.lenght_move
+      item.left_y = opts.lenght_move
+      item.start_begin = true
+      item.post_hover = false
+      item.go_to_back = setTimeout(() => {
+        if(!item.post_hover){
+          item.object.attr('style','' )
+        }
+      },  (Math.abs(item.move_x*parseInt(item.object.width()))
+      +Math.abs(item.move_y*parseInt(item.object.height()))));
+
+      item.move_x = 0
+      item.move_y = 0
+    }
+    function ticks() {
+      items.forEach(function (item) {
+        reaction_on_mouse(item)
+        if (item.hover) {
+          fig_move(item)
+        }else if(!item.start_begin && item.post_hover){
+          fig_go_to_back(item)
+        }
+      })
+    }
+    setInterval(ticks, 1);
+    
+    $(document).on('mousemove', function (e) {
+      pos.x = e.clientX,
+      pos.y = e.clientY;
+   })
   }
   hex_sphere = function () {
     var width = $('#container').innerWidth();
