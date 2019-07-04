@@ -145,7 +145,6 @@ custom = function () {
       }
     })
   }
-
   questions_open = function () {
     $('.license-quest .block .item.active').each(function () {
       var item = $(this);
@@ -191,28 +190,44 @@ custom = function () {
 };
 sliders = function () {
   sliders_init = function () {
-    $('.brends .slider').slick({
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      speed: 1000,
-      infinite: true,
-      dots: true,
-      fade: true,
-    });
-    $('.ambassador-achievement .slider').slick({
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      speed: 1000,
-      infinite: true,
-      fade: true,
-    })
-    $('.project-slider .slider').slick({
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      speed: 1000,
-      infinite: true,
-      fade: true,
-    })
+    sliders_with_layers = function(){
+      var resp = [
+        {
+          breakpoint:850,
+          settings: {
+            fade: false,
+            dots: false,
+          }
+        }
+      ]
+      $('.brends .slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        speed: 1000,
+        infinite: true,
+        dots: true,
+        fade: true,
+        responsive: resp
+      });
+      $('.ambassador-achievement .slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        speed: 1000,
+        infinite: true,
+        fade: true,
+        responsive: resp
+      })
+      $('.project-slider .slider').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        speed: 1000,
+        infinite: true,
+        fade: true,
+        responsive: resp
+      })
+      
+    }
+    
     $('.about-podhod .slider').slick({
       slidesToShow: 2,
       slidesToScroll: 1,
@@ -258,8 +273,25 @@ sliders = function () {
       infinite: false,
       arrows: false
     })
+    sliders_for_mobile = function(){
+      if($(window).width()<769){
+        $('.cases .content .block').slick({
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          speed: 1000,
+          infinite: false,
+          arrows: false,
+        })
+      }else{
+      }
+    }
+    $(window).resize(function(){
+        sliders_for_mobile()
+    })
+    sliders_for_mobile();
+    sliders_with_layers();
   }
-  sliders_init_callback = function () {
+  sliders_init_before = function () {
     $('.brends .slider').on('init', function () {
       var i = 0;
       $('.brends .slider .slick-slide').each(function () {
@@ -287,7 +319,7 @@ sliders = function () {
     })
 
   }
-  sliders_post = function () {
+  sliders_init_after = function () {
     var sliders = [//для анимации переключения
       $('.brends .slider'),
       $('.project-slider .slider'),
@@ -354,9 +386,10 @@ sliders = function () {
       })
     })
   }
-  sliders_init_callback();
+  
+  sliders_init_before();
   sliders_init();
-  sliders_post();
+  sliders_init_after();
 }
 animate = function () {
   graph = function () {
