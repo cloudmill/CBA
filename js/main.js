@@ -542,7 +542,7 @@ animate = function () {
   }
   polugone_move_on_mouse = function () {
     var items = [],
-      pos = {
+      mouse = {
         x: 0,
         y: 0
       },
@@ -559,31 +559,26 @@ animate = function () {
       this.width = obj.width()
       this.height = obj.height()
       this.direction = Math.random() * Math.PI * 2;
-
       this.filling = { x: 0, y: 0 }
       this.x;
       this.y;
       this.dx = 0
       this.dy = 0
-
       this.transform = '';
-      this.start_begin = false;
-
       this.hover = false;
-      this.post_hover = false;
-
-      this.moving = false;
       this.free = true;
-
-      this.time_go_to_back = 0
-      this.move_free;
-
-      this.go_to_back;
-      this.move_free_do = function (item) {
-        item.direction += opts.angle_step * (Math.random() - 0.5)
-        item.dx = Math.cos(item.direction) / 4
-        item.dy = -Math.sin(item.direction) / 4
-        item.moving()
+      this.move_to = {
+        mouse: function (item) {
+          item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
+          item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
+          item.moving()
+        },
+        free: function (item) {
+          item.direction += opts.angle_step * (Math.random() - 0.5)
+          item.dx = Math.cos(item.direction) / 4
+          item.dy = -Math.sin(item.direction) / 4
+          item.moving()
+        }
       }
       this.moving = function () {
         this.cur_position()
@@ -621,85 +616,53 @@ animate = function () {
           acos = Math.PI * 2 - acos
         this.direction = acos
       }
-    }
-    calc_functions = function () {
-      pos = function (item) {
-        var
-          x = item.offset().left + item.width() / 2,
-          y = item.offset().top - $(document).scrollTop() + item.height() / 2;
-        return { x: x, y: y }
-      }
-      shorted = function (a, b, l) {
-        return (Math.abs(a - b)) < l
-      }
-      round = function (num, step) {
-        return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
+      this.check_hover = function (item) {
+        if (shorted(this.y, mouse.y, this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)
+          && shorted(this.x, mouse.x, this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)) {
+          this.hover = true
+          this.set_direction(this.x - mouse.x, this.y - mouse.y);
+          this.filling.y = round(1 - Math.abs((this.y - mouse.y) / (this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)), 3)
+          this.filling.x = round(1 - Math.abs((this.x - mouse.x) / (this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)), 3)
+        } else {
+          this.hover = false;
+        }
       }
     }
-    calc_functions()
     $('.figure').each(function () {
       items.push(new item($(this)))
     })
-    //items.push(new item($('.figure').eq(6)))
-    interaction_with_mouse = function (item) {
-      var
-        pos_temp = pos(item.object)
-      if (shorted(pos_temp.y, pos.y, item.height * opts.k_lenght_fill - item.height / 2 + opts.add_lenght_fill)
-        && shorted(pos_temp.x, pos.x, item.width * opts.k_lenght_fill - item.width / 2 + opts.add_lenght_fill)) {
-        item.hover = true
-        item.set_direction(pos_temp.x - pos.x, pos_temp.y - pos.y);
-        item.filling.y = round(1 - Math.abs((pos_temp.y - pos.y) / (item.height * opts.k_lenght_fill  - item.height / 2 + opts.add_lenght_fill) ), 3)
-        item.filling.x = round(1 - Math.abs((pos_temp.x - pos.x) / (item.width * opts.k_lenght_fill - item.width / 2 + opts.add_lenght_fill) ), 3)
-      } else {
-        item.hover = false;
-      }
-    }
-    fig_move = function (item) {
-      item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
-      item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
-      item.moving()
-    }
-    fig_go_to_back = function (item) {
-      item.time_go_to_back = (Math.abs(item.move.x * parseInt(item.object.width()))
-        + Math.abs(item.move.y * parseInt(item.object.height()))) / 7
-      item.object.css('transform', 'translate(' + 0 + 'px,' + 0 + 'px)');
-      item.move.x = 0
-      item.move.y = 0
-
-      item.object.css('transition', 'transform ' + item.time_go_to_back / 1000 / 2 + 's');
-
-      item.start_begin = true
-      item.post_hover = false
-
-      item.go_to_back = setTimeout(() => {
-        if (!item.post_hover) {
-          item.object.css('transition', 'none')
-          item.start_begin = false;
-          item.free = true;
-        }
-      }, item.time_go_to_back);
-    }
     function ticks() {
       items.forEach(function (item) {
-        interaction_with_mouse(item)
+        item.check_hover(item)
         if (item.hover) {
-          fig_move(item)
+          item.move_to.mouse(item)
         }
         else {
-          item.move_free_do(item)
+          item.move_to.free(item);
         }
       })
     }
     var start_anim;
-    if ($(window).width() > 768) {
-      start_anim = setInterval(ticks, 1);
-      $(document).on('mousemove', function (e) {
-        pos.x = e.clientX;
-        pos.y = e.clientY;
-      })
-    } else {
+
+    start_anim = setInterval(ticks, 10);
+
+
+    $(document).on('mousemove', function (e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    })
+    if ($(window).width() <= 768) {
       clearInterval(start_anim)
       $('.figure').remove();
+    } 
+    /////////
+
+    /////////
+    shorted = function (a, b, l) {
+      return (Math.abs(a - b)) < l
+    }
+    round = function (num, step) {
+      return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
     }
   }
   hex_sphere = function () {
@@ -847,19 +810,24 @@ animate = function () {
       var x = event.clientX
       cameraAnglex = (x - width / 2) / width / 2
     })
+    var do_animate = true;
     var setup = function () {
-      requestAnimationFrame(tick);
+      if(do_animate){
+        tick();
+      }
+      requestAnimationFrame(setup);
     }
+    $(document).on('scroll',function(){
+        do_animate = $(document).scrollTop()<$('#container').height()
+    })
     var tick = function () {
       var rotateCameraBy = Math.PI / 100 * cameraAnglex;
       cameraAngle += rotateCameraBy;
-
       camera.position.x = cameraDistance * Math.cos(cameraAngle);
       camera.position.y = Math.sin(cameraAngle) * 10;
       camera.position.z = cameraDistance * Math.sin(cameraAngle);
       camera.lookAt(scene.position);
       renderer.render(scene, camera);
-
 
       var nextTiles = [];
 
@@ -873,8 +841,6 @@ animate = function () {
         });
       });
       currentTiles = nextTiles;
-      requestAnimationFrame(tick);
-
     }
     function onWindowResize() {
       camera.aspect = $('#container').innerWidth() / $('#container').innerHeight();
