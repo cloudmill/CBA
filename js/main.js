@@ -190,10 +190,10 @@ custom = function () {
 };
 sliders = function () {
   sliders_init = function () {
-    sliders_with_layers = function(){
+    sliders_with_layers = function () {
       var resp = [
         {
-          breakpoint:850,
+          breakpoint: 850,
           settings: {
             fade: false,
             dots: false,
@@ -225,9 +225,9 @@ sliders = function () {
         fade: true,
         responsive: resp
       })
-      
+
     }
-    
+
     $('.about-podhod .slider').slick({
       slidesToShow: 2,
       slidesToScroll: 1,
@@ -273,8 +273,8 @@ sliders = function () {
       infinite: false,
       arrows: false
     })
-    sliders_for_mobile = function(){
-      if($(window).width()<769){
+    sliders_for_mobile = function () {
+      if ($(window).width() < 769) {
         $('.cases .content .block').slick({
           slidesToShow: 1,
           slidesToScroll: 1,
@@ -282,11 +282,11 @@ sliders = function () {
           infinite: false,
           arrows: false,
         })
-      }else{
+      } else {
       }
     }
-    $(window).resize(function(){
-        sliders_for_mobile()
+    $(window).resize(function () {
+      sliders_for_mobile()
     })
     sliders_for_mobile();
     sliders_with_layers();
@@ -386,7 +386,7 @@ sliders = function () {
       })
     })
   }
-  
+
   sliders_init_before();
   sliders_init();
   sliders_init_after();
@@ -547,142 +547,158 @@ animate = function () {
         y: 0
       },
       opts = {
-        lenght_move: 100,
-        k_lenght_fill: 3,
-        start_forse: 8
+        k_lenght_fill: 1,
+        add_lenght_fill: 200,
+        start_forse: 3,
+        angle_step: Math.PI / 6
       };
     item = function (obj) {
-      this.move_x = 0
-      this.move_y = 0
-      this.tick_t = 0;
-      this.left_x = opts.lenght_move
-      this.left_y = opts.lenght_move
-      this.forse_y = opts.start_forse
-      this.forse_x = opts.start_forse;
       this.object = obj;
+      this.move = { x: 0, y: 0 };
+      this.forse = { y: opts.start_forse, x: opts.start_forse };
+      this.width = obj.width()
+      this.height = obj.height()
+      this.direction = Math.random() * Math.PI * 2;
+
+      this.filling = { x: 0, y: 0 }
+      this.x;
+      this.y;
       this.dx = 0
+      this.dy = 0
+
       this.transform = '';
       this.start_begin = false;
-      this.post_hover = false;
-      this.hover = false;
-      this.post_move_free = false;
-      this.dy = 0
-      this.time_go_to_back = 0
-      this.x_old = 0
-      this.y_old = 0
 
-      this.go_to_back = setTimeout(() => { }, 1)
-      this.time_move_next = 30
-      this.move_free = function () {
-        this.transform = "translate(" + this.x_old + "px," + this.y_old + "px)";
-        this.move_x = this.x_old
-        this.move_y = this.y_old
-        this.x_old = (Math.random() - 0.5) * this.forse_x * 3
-        this.y_old = (Math.random() - 0.5) * this.forse_y * 3
+      this.hover = false;
+      this.post_hover = false;
+
+      this.moving = false;
+      this.free = true;
+
+      this.time_go_to_back = 0
+      this.move_free;
+
+      this.go_to_back;
+      this.move_free_do = function (item) {
+        item.direction += opts.angle_step * (Math.random() - 0.5)
+        item.dx = Math.cos(item.direction) / 4
+        item.dy = -Math.sin(item.direction) / 4
+        item.moving()
+      }
+      this.moving = function () {
+        this.cur_position()
+        this.border()
+        this.set_pos()
+      }
+      this.border = function () {
+        if (this.x + this.dx - this.width / 2 > 0 && this.x + this.dx + this.width / 2 < $(window).width()) {
+          this.move.x += this.dx
+        } else if (this.x + this.dx + this.width / 2 > $(window).width()) {
+          this.move.x -= 0.1
+        } else {
+          this.move.x += 0.1
+        }
+        if (this.y + this.dy - this.height / 2 > 0 && this.y + this.dy + this.height / 2 < $('body').height()) {
+          this.move.y += this.dy
+        } else if (this.y + this.dy + this.height / 2 > $('body').height()) {
+          this.move.y -= 0.1
+        } else {
+          this.move.y += 0.1
+        }
+      }
+      this.set_pos = function () {
+        this.transform = "translate(" + this.move.x + "px," + this.move.y + "px)";
         this.object.css('transform', this.transform)
-        this.object.css('transition', 'transform 4s')
-        this.post_move_free = true;
+      }
+      this.cur_position = function () {
+        this.x = this.object.offset().left + this.width / 2;
+        this.y = this.object.offset().top + this.height / 2
+      }
+      this.set_direction = function (x, y) {
+        var gip = Math.sqrt(x * x + y * y)
+        var acos = -Math.acos(x / gip) + Math.PI
+        if (y < 0)
+          acos = Math.PI * 2 - acos
+        this.direction = acos
       }
     }
-
-    pos = function (item) {
-      var
-        x = item.offset().left + item.width() / 2,
-        y = item.offset().top - $(document).scrollTop() + item.height() / 2;
-      return { x: x, y: y }
+    calc_functions = function () {
+      pos = function (item) {
+        var
+          x = item.offset().left + item.width() / 2,
+          y = item.offset().top - $(document).scrollTop() + item.height() / 2;
+        return { x: x, y: y }
+      }
+      shorted = function (a, b, l) {
+        return (Math.abs(a - b)) < l
+      }
+      round = function (num, step) {
+        return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
+      }
     }
-    shorted = function (a, b, l) {
-      return (Math.abs(a - b)) < l
-    }
-    round = function (num, step) {
-      return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
-    }
+    calc_functions()
     $('.figure').each(function () {
       items.push(new item($(this)))
     })
-    reaction_on_mouse = function (item) {
+    //items.push(new item($('.figure').eq(6)))
+    interaction_with_mouse = function (item) {
       var
         pos_temp = pos(item.object)
-      if (shorted(pos_temp.y, pos.y, item.object.height() * opts.k_lenght_fill / 2)
-        && shorted(pos_temp.x, pos.x, item.object.width() * opts.k_lenght_fill / 2)) {
+      if (shorted(pos_temp.y, pos.y, item.height * opts.k_lenght_fill - item.height / 2 + opts.add_lenght_fill)
+        && shorted(pos_temp.x, pos.x, item.width * opts.k_lenght_fill - item.width / 2 + opts.add_lenght_fill)) {
         item.hover = true
-        item.dy = round(1 - Math.abs((pos_temp.y - pos.y) / (item.object.height() * opts.k_lenght_fill / 2)), 3) * (pos_temp.y - pos.y < 0 ? -1 : 1)
-        item.dx = round(1 - Math.abs((pos_temp.x - pos.x) / (item.object.width() * opts.k_lenght_fill / 2)), 3) * (pos_temp.x - pos.x < 0 ? -1 : 1)
+        item.set_direction(pos_temp.x - pos.x, pos_temp.y - pos.y);
+        item.filling.y = round(1 - Math.abs((pos_temp.y - pos.y) / (item.height * opts.k_lenght_fill  - item.height / 2 + opts.add_lenght_fill) ), 3)
+        item.filling.x = round(1 - Math.abs((pos_temp.x - pos.x) / (item.width * opts.k_lenght_fill - item.width / 2 + opts.add_lenght_fill) ), 3)
       } else {
-        item.hover = false
+        item.hover = false;
       }
     }
     fig_move = function (item) {
-      clearTimeout(item.go_to_back)
-      item.object.css('transition', 'none');
-      var d_x, d_y;
-      d_x = round(item.move_x
-        + item.dx
-        * item.forse_x
-        * Math.abs(item.dy * 0.2), 3)
-      d_y = round(item.move_y
-        + item.dy
-        * item.forse_y
-        * Math.abs(item.dx * 0.2), 3)
-      item.move_x = d_x
-      item.move_y = d_y
-      item.left_x = opts.lenght_move - Math.abs(d_x)
-      item.left_y = opts.lenght_move - Math.abs(d_y)
-      item.transform = "translate(" + d_x + "px," + d_y + "px)";
-      item.object.css('transform', item.transform)
-      item.post_hover = true;
+      item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
+      item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
+      item.moving()
     }
     fig_go_to_back = function (item) {
-      item.time_go_to_back = (Math.abs(item.move_x * parseInt(item.object.width()))
-        + Math.abs(item.move_y * parseInt(item.object.height()))) / 7
-      
-      if (item.post_move_free) {
-        item.time_go_to_back = 500
-        item.object.css('transform', 'translate(' + item.move_x + 'px,' + item.move_y + 'px)');
-      }else{
-        item.object.css('transform', 'translate(' + 0 + 'px,' + 0 + 'px)');
-        item.move_x = 0
-        item.move_y = 0
-      }
-      item.object.css('transition', 'transform ' + item.time_go_to_back / 1000 + 's');
-      
+      item.time_go_to_back = (Math.abs(item.move.x * parseInt(item.object.width()))
+        + Math.abs(item.move.y * parseInt(item.object.height()))) / 7
+      item.object.css('transform', 'translate(' + 0 + 'px,' + 0 + 'px)');
+      item.move.x = 0
+      item.move.y = 0
+
+      item.object.css('transition', 'transform ' + item.time_go_to_back / 1000 / 2 + 's');
+
       item.start_begin = true
       item.post_hover = false
-      item.post_move_free = false;
+
       item.go_to_back = setTimeout(() => {
         if (!item.post_hover) {
           item.object.css('transition', 'none')
           item.start_begin = false;
+          item.free = true;
         }
       }, item.time_go_to_back);
-      
-      item.left_x = opts.lenght_move - item.move_x
-      item.left_y = opts.lenght_move - item.move_y
     }
     function ticks() {
       items.forEach(function (item) {
-        item.tick_t++
-        reaction_on_mouse(item)
-        if(!item.start_begin){
-          if (item.hover && !item.post_move_free) {
-            fig_move(item)
-          } else if (item.post_hover || (item.post_move_free && item.hover)) {
-            fig_go_to_back(item)
-          }
-          else if (item.tick_t > item.time_move_next) {
-            item.move_free()
-            item.tick_t = 0;
-          }
+        interaction_with_mouse(item)
+        if (item.hover) {
+          fig_move(item)
+        }
+        else {
+          item.move_free_do(item)
         }
       })
     }
-    if($(window).width()>768){
-      setInterval(ticks, 1);
+    var start_anim;
+    if ($(window).width() > 768) {
+      start_anim = setInterval(ticks, 1);
       $(document).on('mousemove', function (e) {
-        pos.x = e.clientX,
-          pos.y = e.clientY;
+        pos.x = e.clientX;
+        pos.y = e.clientY;
       })
-    }else{
+    } else {
+      clearInterval(start_anim)
       $('.figure').remove();
     }
   }
@@ -694,7 +710,7 @@ animate = function () {
     renderer.setSize(width, height);
     renderer.setClearColor(0xf5f5f5);
     var cameraDistance = 65;
-    if($(window).width()<551)cameraDistance = 70
+    if ($(window).width() < 551) cameraDistance = 70
     var camera = new THREE.PerspectiveCamera(cameraDistance, width / height, 1, 200);
     camera.position.z = -cameraDistance;
 
@@ -716,16 +732,33 @@ animate = function () {
       var hexasphere = new Hexasphere(radius, divisions, tileSize);
       var material_sphere = new THREE.MeshBasicMaterial({ color: color })
       var geometry_sphere = new THREE.SphereBufferGeometry(0.2, 4, 4)
+      var points_spheres = {
+        x: [], y: [], z: []
+      }
+      function find_in_all(ar, x, y, z) {
+        var find = false
+        ar.x.forEach(function (item, i) {
+          if (item == x && ar.y[i] == y && ar.z[i] == z) {
+            find = true;
+          }
+        })
+        return find;
+      }
       for (var i = 0; i < hexasphere.tiles.length; i++) {
         var t = hexasphere.tiles[i];
         var geometry = new THREE.Geometry();
         for (var j = 0; j < t.boundary.length; j++) {
           var bp = t.boundary[j];
           geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
-          var obj = new THREE.Mesh(geometry_sphere, material_sphere);
-          obj.position.copy(new THREE.Vector3(bp.x, bp.y, bp.z));
-          if($(window).width()>768)
-            scene.add(obj)
+          if (!find_in_all(points_spheres, bp.x, bp.y, bp.z)) {
+            points_spheres.x.push(bp.x)
+            points_spheres.y.push(bp.y)
+            points_spheres.z.push(bp.z)
+            var obj = new THREE.Mesh(geometry_sphere, material_sphere);
+            obj.position.copy(new THREE.Vector3(bp.x, bp.y, bp.z));
+            if ($(window).width() > 768)
+              scene.add(obj)
+          }
         }
         center = function (x1, y1, z1, x2, y2, z2, req, d, l) {
           var xt, yt, zt;
