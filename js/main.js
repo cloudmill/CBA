@@ -628,10 +628,9 @@ animate = function () {
         }
       }
     }
-    /* $('.figure').each(function () {
+    $('.figure').each(function () {
       items.push(new item($(this)))
-    }) */
-    items.push(new item($('.figure').eq(6)))
+    })
     function ticks() {
       items.forEach(function (item) {
         item.check_hover(item)
