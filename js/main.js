@@ -617,20 +617,21 @@ animate = function () {
         this.direction = acos
       }
       this.check_hover = function (item) {
-        if (shorted(this.y, mouse.y, this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)
+        if (shorted(this.y - $(document).scrollTop(), mouse.y, this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)
           && shorted(this.x, mouse.x, this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)) {
           this.hover = true
-          this.set_direction(this.x - mouse.x, this.y - mouse.y);
-          this.filling.y = round(1 - Math.abs((this.y - mouse.y) / (this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)), 3)
+          this.set_direction(this.x - mouse.x, this.y - $(document).scrollTop() - mouse.y);
+          this.filling.y = round(1 - Math.abs((this.y - $(document).scrollTop() - mouse.y) / (this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)), 3)
           this.filling.x = round(1 - Math.abs((this.x - mouse.x) / (this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)), 3)
         } else {
           this.hover = false;
         }
       }
     }
-    $('.figure').each(function () {
+    /* $('.figure').each(function () {
       items.push(new item($(this)))
-    })
+    }) */
+    items.push(new item($('.figure').eq(6)))
     function ticks() {
       items.forEach(function (item) {
         item.check_hover(item)
