@@ -180,7 +180,7 @@ custom = function () {
   short_text();
   forms();
 
-  if (('input[name=phone]').length > 0) {
+  if ($('input[name=phone]').length > 0) {
     $('input[name=phone]').mask("+7 (999) 99-99-999");
   }
   function mail_right(email) {
@@ -227,13 +227,20 @@ sliders = function () {
       })
 
     }
-
     $('.about-podhod .slider').slick({
       slidesToShow: 2,
       slidesToScroll: 1,
       speed: 1000,
       arrows: false,
       infinite: false,
+      responsive: [
+        {
+          breakpoint: 1300,
+          settings: {
+            slidesToShow: 1,
+          }
+        }
+      ]
     })
     $('.about-advantage .slider').slick({
       slidesToShow: 2,
@@ -282,7 +289,15 @@ sliders = function () {
           infinite: false,
           arrows: false,
         })
-      } else {
+      }
+      if ($(window).width() < 1025) {
+        $('.read_yet .list').slick({
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          speed: 1000,
+          infinite: false,
+          arrows: false
+        })
       }
     }
     $(window).resize(function () {
@@ -520,43 +535,31 @@ animate = function () {
     })
     setup();
   }
-  paralax_polygon = function () {
-    $('.figure').each(function () {
-      speed = parseInt(Math.random() * 25 + 45)
-      $(this).attr('start-scroll', 'null')
-      $(this).attr('data-speed', speed)
-    })
-    $(document).on('scroll', function () {
-      $('.figure').each(function () {
-        if ($(this).offset().top < $(document).scrollTop() + $(window).height() && $(this).offset().top + $(this).height() > $(document).scrollTop()) {
-          if ($(this).attr('start-scroll') == 'null') {
-            $(this).attr('start-scroll', $(document).scrollTop())
-            $(this).attr('direction', Math.random() > 0.5 ? -1 : 1)
-          }
-          var top = ($(this).data('speed') / 100 * ($(document).scrollTop() - $(this).attr('start-scroll')))
-          $(this).css('transform', 'translate(0,' + top + 'px) rotate(' + (180 * top / 5000) * $(this).attr('direction') + 'deg)')
-          console.log(top)
-        }
-      })
-    })
-  }
   polugone_move_on_mouse = function () {
+    $('body').append('<div class="figures_click"></div>')
     var items = [],
-      mouse = {
-        x: 0,
-        y: 0
-      },
+      scroll_top = 0,
+      figures_on_click = 0,
+    mouse = {
+      x: 0,
+      y: 0
+    },
+      key_press = false,
       opts = {
-        k_lenght_fill: 1,
-        add_lenght_fill: 200,
-        start_forse: 3,
-        angle_step: Math.PI / 6
+        k_lenght_fill: 1, // коофициент дальньности взаимодействия от размера обьекта
+        add_lenght_fill: 200, // дополнительная дальность взаимодействия
+        start_forse: 3, // коофициент взаимодействия с курсором
+        time_clear_mouse: 2000, // время сброса кооднинат курсора (мс)
+        angle_step: Math.PI / 30, // угол поворота
+        rotate_probability: 40, //% вероятность поворота при свободном движении 
+        speed_free: 40 //скорость (пикесель в сек)
       };
-    item = function (obj) {
+    item = function (obj,x,y) {
       this.object = obj;
-      this.move = { x: 0, y: 0 };
+      this.move = { x: x||0, y: y||0 };
       this.forse = { y: opts.start_forse, x: opts.start_forse };
       this.width = obj.width()
+      this.go_mouse = false;
       this.height = obj.height()
       this.direction = Math.random() * Math.PI * 2;
       this.filling = { x: 0, y: 0 }
@@ -574,9 +577,16 @@ animate = function () {
           item.moving()
         },
         free: function (item) {
-          item.direction += opts.angle_step * (Math.random() - 0.5)
-          item.dx = Math.cos(item.direction) / 4
-          item.dy = -Math.sin(item.direction) / 4
+          if (Math.random() + 1 * opts.rotate_probability / 100 > 1)
+            item.direction += opts.angle_step * (Math.random() > 0.5 ? 1 : -1);
+          item.dx = Math.cos(item.direction) / 100 * opts.speed_free
+          item.dy = -Math.sin(item.direction) / 100 * opts.speed_free
+          item.moving()
+        },
+        go_to_mouse: function (item) {
+          item.set_direction(item.x - (mouse.x ), item.y - (mouse.y + scroll_top))
+          item.dx = Math.cos(item.direction) / 30 * opts.speed_free
+          item.dy = -Math.sin(item.direction) / 30 * opts.speed_free
           item.moving()
         }
       }
@@ -616,16 +626,19 @@ animate = function () {
           acos = Math.PI * 2 - acos
         this.direction = acos
       }
-      this.check_hover = function (item) {
-        if (shorted(this.y - $(document).scrollTop(), mouse.y, this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)
+      this.check_hover = function () {
+        if (shorted(this.y - scroll_top, mouse.y, this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)
           && shorted(this.x, mouse.x, this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)) {
           this.hover = true
-          this.set_direction(this.x - mouse.x, this.y - $(document).scrollTop() - mouse.y);
-          this.filling.y = round(1 - Math.abs((this.y - $(document).scrollTop() - mouse.y) / (this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)), 3)
+          this.set_direction(this.x - mouse.x, this.y - scroll_top - mouse.y);
+          this.filling.y = round(1 - Math.abs((this.y - scroll_top - mouse.y) / (this.height * opts.k_lenght_fill - this.height / 2 + opts.add_lenght_fill)), 3)
           this.filling.x = round(1 - Math.abs((this.x - mouse.x) / (this.width * opts.k_lenght_fill - this.width / 2 + opts.add_lenght_fill)), 3)
         } else {
           this.hover = false;
         }
+        /* if(!shorted(this.y - scroll_top, mouse.y, $(window).height()/3*2) || !shorted(this.x, mouse.x, $(window).width()/3*2)){
+          this.go_mouse = true;
+        } else this.go_mouse = false; */
       }
     }
     $('.figure').each(function () {
@@ -633,12 +646,17 @@ animate = function () {
     })
     function ticks() {
       items.forEach(function (item) {
-        item.check_hover(item)
-        if (item.hover) {
-          item.move_to.mouse(item)
-        }
-        else {
-          item.move_to.free(item);
+        item.check_hover()
+        if (key_press || item.go_mouse) {
+          item.move_to.go_to_mouse(item)
+        } else {
+          
+          if (item.hover) {
+            item.move_to.mouse(item)
+          }
+          else {
+            item.move_to.free(item);
+          }
         }
       })
     }
@@ -646,15 +664,39 @@ animate = function () {
 
     start_anim = setInterval(ticks, 10);
 
-
+    var clear_mouse;
     $(document).on('mousemove', function (e) {
+      clearTimeout(clear_mouse)
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      clear_mouse = setTimeout(function () {
+        if (!key_press) {
+          mouse.x = -10000;
+          mouse.y = -10000;
+        }
+      }, opts.time_clear_mouse)
     })
+    $(document).on('mousedown', function () {
+      key_press = true;
+    })
+    $(document).on('mouseup', function () {
+      key_press = false
+    })
+    
+    /* $(document).on('click',function(e){
+      if(figures_on_click < 4){
+        $('.figures_click').append('<div data-id='+items.length+' class="figure_click"></div>')
+        items.push(new item($('.figure_click').eq(figures_on_click),mouse.x,mouse.y+scroll_top))
+        figures_on_click++;
+      }
+    }) */
     if ($(window).width() <= 768) {
       clearInterval(start_anim)
       $('.figure').remove();
-    } 
+    }
+    $(document).on('scroll', function () {
+      scroll_top = $(this).scrollTop();
+    })
     /////////
 
     /////////
@@ -812,13 +854,13 @@ animate = function () {
     })
     var do_animate = true;
     var setup = function () {
-      if(do_animate){
+      if (do_animate) {
         tick();
       }
       requestAnimationFrame(setup);
     }
-    $(document).on('scroll',function(){
-        do_animate = $(document).scrollTop()<$('#container').height()
+    $(document).on('scroll', function () {
+      do_animate = $(document).scrollTop() < $('#container').height()
     })
     var tick = function () {
       var rotateCameraBy = Math.PI / 100 * cameraAnglex;
