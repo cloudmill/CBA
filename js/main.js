@@ -154,6 +154,13 @@ custom = function () {
         + item.find('.text').height()
         + parseFloat(item.find('.text').css('padding-top').replace('px', ''))
         + parseFloat(item.find('.text').css('padding-bottom').replace('px', ''));
+      item.css('height', height_temp + 15)
+    })
+    $('.license-quest .block .item:not(.active)').each(function (item) {
+      var item = $(this);
+      var height_temp = item.find('.head').height()
+        + parseFloat(item.find('.head').css('padding-top').replace('px', ''))
+        + parseFloat(item.find('.head').css('padding-bottom').replace('px', ''))
       item.css('height', height_temp)
     })
     $('.license-quest .block .item').each(function () {
@@ -162,6 +169,10 @@ custom = function () {
         if (item.hasClass('active')) {
           item.removeClass('active')
           item.attr('style', '')
+          var height_temp = item.find('.head').height()
+            + parseFloat(item.find('.head').css('padding-top').replace('px', ''))
+            + parseFloat(item.find('.head').css('padding-bottom').replace('px', ''))
+          item.css('height', height_temp)
         } else {
           item.addClass('active')
           var height_temp = item.find('.head').height()
@@ -248,6 +259,14 @@ sliders = function () {
       speed: 1000,
       arrows: false,
       infinite: false,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 1,
+          }
+        }
+      ]
     })
     $('.project-recomendation .left .slider').slick({
       slidesToShow: 1,
@@ -278,7 +297,15 @@ sliders = function () {
       speed: 1000,
       swipe: false,
       infinite: false,
-      arrows: false
+      arrows: false,
+      responsive: [
+        {
+          breakpoint: 768,
+          settings: {
+            swipe: true,
+          }
+        }
+      ]
     })
     sliders_for_mobile = function () {
       if ($(window).width() < 769) {
@@ -351,6 +378,9 @@ sliders = function () {
 
     $('.license-opportun .slider.one').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
       $('.license-opportun .slider.two').slick('slickGoTo', nextSlide)
+    })
+    $('.license-opportun .slider.two').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
+      $('.license-opportun .slider.one').slick('slickGoTo', nextSlide)
     })
 
     $('.project-recomendation .left .slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
@@ -540,10 +570,10 @@ animate = function () {
     var items = [],
       scroll_top = 0,
       figures_on_click = 0,
-    mouse = {
-      x: 0,
-      y: 0
-    },
+      mouse = {
+        x: 0,
+        y: 0
+      },
       key_press = false,
       opts = {
         k_lenght_fill: 1, // коофициент дальньности взаимодействия от размера обьекта
@@ -552,11 +582,13 @@ animate = function () {
         time_clear_mouse: 2000, // время сброса кооднинат курсора (мс)
         angle_step: Math.PI / 30, // угол поворота
         rotate_probability: 40, //% вероятность поворота при свободном движении 
-        speed_free: 40 //скорость (пикесель в сек)
+        speed_free: 40, //скорость (пикесель в сек)
+        lenght_travel: 100, // растояние для начала двидения в изначальной точке
+        finish_home_from_travel: 10, //растояние прекращения возвращения
       };
-    item = function (obj,x,y) {
+    item = function (obj, x, y) {
       this.object = obj;
-      this.move = { x: x||0, y: y||0 };
+      this.move = { x: x || 0, y: y || 0 };
       this.forse = { y: opts.start_forse, x: opts.start_forse };
       this.width = obj.width()
       this.go_mouse = false;
@@ -570,6 +602,7 @@ animate = function () {
       this.transform = '';
       this.hover = false;
       this.free = true;
+      this.want_go_home = false;
       this.move_to = {
         mouse: function (item) {
           item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
@@ -584,9 +617,15 @@ animate = function () {
           item.moving()
         },
         go_to_mouse: function (item) {
-          item.set_direction(item.x - (mouse.x ), item.y - (mouse.y + scroll_top))
+          item.set_direction(item.x - (mouse.x), item.y - (mouse.y + scroll_top))
           item.dx = Math.cos(item.direction) / 30 * opts.speed_free
           item.dy = -Math.sin(item.direction) / 30 * opts.speed_free
+          item.moving()
+        },
+        go_home: function (item) {
+          item.set_direction(item.move.x, item.move.y)
+          item.dx = Math.cos(item.direction) / 100 * opts.speed_free
+          item.dy = -Math.sin(item.direction) / 100 * opts.speed_free
           item.moving()
         }
       }
@@ -636,35 +675,44 @@ animate = function () {
         } else {
           this.hover = false;
         }
-        /* if(!shorted(this.y - scroll_top, mouse.y, $(window).height()/3*2) || !shorted(this.x, mouse.x, $(window).width()/3*2)){
-          this.go_mouse = true;
-        } else this.go_mouse = false; */
+      }
+      this.check_travel_lenght = function () {
+        if (Math.sqrt(this.move.x * this.move.x + this.move.y * this.move.y) > opts.lenght_travel) {
+          this.want_go_home = true
+        } else if (Math.sqrt(this.move.x * this.move.x + this.move.y * this.move.y) > opts.finish_home_from_travel) {
+          this.want_go_home = false
+        }
       }
     }
-    $('.figure').each(function () {
-      items.push(new item($(this)))
-    })
     function ticks() {
       items.forEach(function (item) {
         item.check_hover()
         if (key_press || item.go_mouse) {
           item.move_to.go_to_mouse(item)
         } else {
-          
+
           if (item.hover) {
             item.move_to.mouse(item)
           }
           else {
-            item.move_to.free(item);
+            item.check_travel_lenght()
+            if (item.want_go_home) {
+              item.move_to.go_home(item)
+            } else
+              item.move_to.free(item);
           }
         }
       })
     }
+
+    $('.figure').each(function () {
+      items.push(new item($(this)))
+    })
+
     var start_anim;
-
     start_anim = setInterval(ticks, 10);
-
     var clear_mouse;
+
     $(document).on('mousemove', function (e) {
       clearTimeout(clear_mouse)
       mouse.x = e.clientX;
@@ -682,7 +730,7 @@ animate = function () {
     $(document).on('mouseup', function () {
       key_press = false
     })
-    
+
     /* $(document).on('click',function(e){
       if(figures_on_click < 4){
         $('.figures_click').append('<div data-id='+items.length+' class="figure_click"></div>')
@@ -832,7 +880,7 @@ animate = function () {
 
         var material = new THREE.MeshBasicMaterial({ color: color, transparent: true, wireframe: true })
 
-        material.opacity = 0;
+        material.opacity = 1;
         var mesh = new THREE.Mesh(geometry, material.clone());
         scene.add(mesh);
         hexasphere.tiles[i].mesh = mesh;
@@ -840,8 +888,8 @@ animate = function () {
       seenTiles = {};
       currentTiles = hexasphere.tiles.slice().splice(0, 12);
       currentTiles.forEach(function (item) {
-        seenTiles[item.toString()] = opacity;
-        item.mesh.material.opacity = opacity;
+        seenTiles[item.toString()] = 1;
+        item.mesh.material.opacity = 1;
       });
     };
     createScene(30, 8, 1, 0x54fbe9, 1);
@@ -853,10 +901,13 @@ animate = function () {
       cameraAnglex = (x - width / 2) / width / 2
     })
     var do_animate = true;
+    var tick_pause = -1
     var setup = function () {
-      if (do_animate) {
+      if (do_animate && tick_pause < 0) {
         tick();
+        tick_pause = 2
       }
+      tick_pause--
       requestAnimationFrame(setup);
     }
     $(document).on('scroll', function () {
@@ -870,19 +921,6 @@ animate = function () {
       camera.position.z = cameraDistance * Math.sin(cameraAngle);
       camera.lookAt(scene.position);
       renderer.render(scene, camera);
-
-      var nextTiles = [];
-
-      currentTiles.forEach(function (item) {
-        item.neighbors.forEach(function (neighbor) {
-          if (!seenTiles[neighbor.toString()]) {
-            neighbor.mesh.material.opacity = 1;
-            nextTiles.push(neighbor);
-            seenTiles[neighbor] = 1;
-          }
-        });
-      });
-      currentTiles = nextTiles;
     }
     function onWindowResize() {
       camera.aspect = $('#container').innerWidth() / $('#container').innerHeight();
@@ -893,9 +931,105 @@ animate = function () {
     $("#container").append(renderer.domElement);
     setup()
   };
-  hex_sphere();
+  ;
+  bubbles_move_mouse = function () {
+    var opts = {
+      time_life: 300,//ms
+      time_out : 200,//ms
+      radius: 10,
+      first_opacity: 0.5,
+      interval_create: 10,
+      lenght_create: 5
+    },
+    scroll_top = 0,
+      mouse = {
+        x: -500, y: -500
+      },
+      bubbles = [],
+      bubble = function (x, y, obj) {
+        this.x = x;
+        this.y = y;
+        this.xml_id = x * y * Math.random()
+        this.obj = obj;
+        this.opacity = opts.first_opacity;
+        this.time_life = opts.time_life;
+        this.color = opts.color;
+        this.radius = opts.radius;
+        var start_death = false;
+        this.show = function () {
+          this.obj.css('width', this.radius * 2)
+          this.obj.css('height', this.radius * 2)
+          this.obj.css('opacity', this.opacity)
+          this.obj.css('top', this.y - this.radius)
+          this.obj.css('left', this.x - this.radius)
+        }
+        this.hide = function () {
+          this.show()
+          var item = this;
+          this.obj.animate({
+            opacity: 0,
+            height: 0,
+            width: 0,
+            left: item.x,
+            top: item.y
+          }, this.time_life)
+          setTimeout(function () {
+            item.remove_it()
+          }, this.time_life)
+        }
+        this.remove_it = function () {
+          this.obj.remove()
+          var it = this, id_t = 0
+          bubbles.forEach(function (item, i) {
+            if (item.id == it.id) {
+              id_t = i
+            }
+          })
+          bubbles.splice(id_t, 1);
+        }
+      };
+    var item_create = false, clear_mouse, index_item = 0, hover_a = false;
+    $('body').append('<div class="mouse_fig"></div>')
+    var tick_bubb = function () {
+      if (item_create && !hover_a) {
+        $('.mouse_fig').append('<div id="it' + index_item + '" class="fig"></div>')
+        bubbles.push(new bubble(mouse.x, mouse.y+scroll_top, $('#it' + index_item)))
+        index_item++
+        bubbles.forEach(function (item) {
+          if (!item.start_death) {
+            setTimeout(() => {
+              if(Math.sqrt((item.x-mouse.x)*(item.x-mouse.x)+(item.y-mouse.y-scroll_top)*(item.y-mouse.y-scroll_top))>opts.lenght_create)
+                  item.hide()
+            }, opts.time_out);
+            item.start_death = true;
+          }
+        })
+      }
+    }
 
+    setInterval(tick_bubb, opts.interval_create);
+    $(document).on('mousemove', function (e) {
+      /* if($('a,p,h1,h2,h3,h4,h5,h6,span,input,label,select,button').is(e.target)){
+        hover_a = true
+      }else{
+        hover_a = false
+      } */
+      clearTimeout(clear_mouse)
+      item_create = true
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      clear_mouse = setTimeout(function () {
+        item_create = false
+      }, 2000)
+    })
+    $(document).on('scroll', function () {
+      scroll_top = $(this).scrollTop();
+    })
+  }
+
+  hex_sphere()
   polugone_move_on_mouse();
+  bubbles_move_mouse();
   //paralax_polygon()
 
   if ($('.graph').length > 0) graph();
