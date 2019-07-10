@@ -325,6 +325,13 @@ sliders = function () {
           infinite: false,
           arrows: false
         })
+        $('.integration .row').slick({
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          speed: 1000,
+          infinite: false,
+          arrows: false
+        })
       }
     }
     $(window).resize(function () {
@@ -438,31 +445,25 @@ sliders = function () {
 }
 animate = function () {
   graph = function () {
-    $('#graph').width($('#graph').parent().width())
-    var canvasBody = document.createElement('canvas');
-
-    canvasBody.width = $('.graph').width();
-    canvasBody.height = (30 + $('.graph ul.rows').height());
-    $('.graph').append(canvasBody)
-    $('.graph canvas').attr('id', 'graph')
+    function create() {
+      var canvasBody = document.createElement('canvas');
+      canvasBody.width = $('.graph').width();
+      canvasBody.height = (30 + $('.graph ul.rows').height());
+      $('.graph').append(canvasBody)
+      $('.graph canvas').attr('id', 'graph')
+    }
+    create()
     var canvasBody = document.getElementById('graph'),
       canvas = canvasBody.getContext("2d"),
-      data = [];
-    $('.data-ar input').each(function () {
-      data.push(parseFloat($(this).val()))
-    })
-    var max_value = $('.data-ar').data('max') ? $('.data-ar').data('max') : data[0],
-      min_value = $('.data-ar').data('min') < data[0] ? $('.data-ar').data('min') : data[0];
-    for (i = 0; i < data.length; i++) {
-      if (data[i] > max_value)
-        max_value = data[i]
-      if (data[i] < min_value)
-        min_value = data[i]
-    };
-    var
-      w = $('#graph').width(),
-      h = $('#graph').height(),
-      x_c = -100, y_c = -100,
+      data,
+      max_value,
+      min_value,
+      w, h,
+      width_col,
+      correct_left,
+      correct_bot,
+      gradient,
+      particles,
       opts = {
         object: {
           radius_big: 15,
@@ -477,60 +478,82 @@ animate = function () {
         canvas: {
           bgc: "#fff",
         }
-      },
-      correct_left = 100,
-      correct_bot = opts.object.radius_big,
-
-      particles = [],
-      particle = function (x, y) {
-        this.x = x;
-        this.y = y;
-        this.draw_small = function () {
-          canvas.beginPath();
-          canvas.arc(this.x, this.y, opts.object.radius_small, 0, Math.PI * 2)
-          canvas.closePath();
-          canvas.fillStyle = opts.object.color;
-          canvas.fill();
-        }
-        this.draw_big = function () {
-          canvas.beginPath();
-          canvas.arc(this.x, this.y, opts.object.radius_big, 0, Math.PI * 2)
-          canvas.closePath();
-          canvas.fillStyle = opts.object.color_big;
-          canvas.fill();
-        }
-      },
-      draw_line = function (x1, y1, x2, y2) {
-        canvas.beginPath();
-        canvas.moveTo(x1, y1);
-        canvas.lineTo(x2, y2);
-        canvas.closePath();
-        canvas.strokeStyle = opts.object.color;
-        canvas.lineWidth = opts.object.stroke_width;
-        canvas.stroke();
-      },
-      gradient = canvas.createLinearGradient(w / 2, 0, w / 2, h),
-      draw_polugone = function (x1, y1, x2, y2) {
-        canvas.beginPath();
-        canvas.moveTo(x1, y1);
-        canvas.lineTo(x2, y2);
-        canvas.lineTo(x2, h);
-        canvas.lineTo(x1, h);
-        canvas.closePath();
-
-        gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
-        gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
-        canvas.fillStyle = gradient;
-        canvas.fill();
-
       };
-    function setup() {
+    function set_values() {
+      canvasBody.width = $('.graph').width();
+      canvasBody.height = (30 + $('.graph ul.rows').height());
+      data = [];
+      particles = []
+      $('.data-ar input').each(function () {
+        data.push(parseFloat($(this).val()))
+      })
+      max_value = $('.data-ar').data('max') ? $('.data-ar').data('max') : data[0]
+      min_value = $('.data-ar').data('min') < data[0] ? $('.data-ar').data('min') : data[0];
       for (i = 0; i < data.length; i++) {
-        var x = i * ((w) / data.length) + correct_left,
+        if (data[i] > max_value)
+          max_value = data[i]
+        if (data[i] < min_value)
+          min_value = data[i]
+      };
+      w = $('#graph').width()
+      h = $('#graph').height()
+      width_col = $('.graph .cols li').width()
+      correct_left = parseFloat($('.graph .cols').css('padding-left')) + parseFloat($('.graph .cols').css('margin-left')) + width_col / 2
+      correct_bot = opts.object.radius_big
+      gradient = canvas.createLinearGradient(w / 2, 0, w / 2, h)
+    }
+
+    var particle = function (x, y) {
+      this.x = x;
+      this.y = y;
+      this.draw_small = function () {
+        canvas.beginPath();
+        canvas.arc(this.x, this.y, opts.object.radius_small, 0, Math.PI * 2)
+        canvas.closePath();
+        canvas.fillStyle = opts.object.color;
+        canvas.fill();
+      }
+      this.draw_big = function () {
+        canvas.beginPath();
+        canvas.arc(this.x, this.y, opts.object.radius_big, 0, Math.PI * 2)
+        canvas.closePath();
+        canvas.fillStyle = opts.object.color_big;
+        canvas.fill();
+      }
+    }
+    var draw_line = function (x1, y1, x2, y2) {
+      canvas.beginPath();
+      canvas.moveTo(x1, y1);
+      canvas.lineTo(x2, y2);
+      canvas.closePath();
+      canvas.strokeStyle = opts.object.color;
+      canvas.lineWidth = opts.object.stroke_width;
+      canvas.stroke();
+    }
+    var draw_polugone = function (x1, y1, x2, y2) {
+      canvas.beginPath();
+      canvas.moveTo(x1, y1);
+      canvas.lineTo(x2, y2);
+      canvas.lineTo(x2, h);
+      canvas.lineTo(x1, h);
+      canvas.closePath();
+
+      gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
+      gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
+      canvas.fillStyle = gradient;
+      canvas.fill();
+
+    };
+    var animate_graph;
+    function setup() {
+      cancelAnimationFrame(animate_graph)
+      set_values()
+      for (i = 0; i < data.length; i++) {
+        var x = i * ((w - correct_left + width_col / 2) / (data.length)) + correct_left,
           y = h - 20 - (data[i] - min_value) * ((h - correct_bot * 2 - 20) / (max_value - min_value)) - correct_bot;
         particles.push(new particle(x, y));
       }
-      window.requestAnimationFrame(loop);
+      loop()
     };
     function loop() {
       canvas.fillStyle = opts.canvas.bgc;
@@ -538,31 +561,34 @@ animate = function () {
       for (i = 0; i < particles.length; i++) {
         particles[i].draw_big()
         particles[i].draw_small();
-        //console.log(particles[i])
-        //particles[i].move()
       }
       for (i = 1; i < particles.length; i++) {
         draw_line(
           particles[i].x, particles[i].y,
           particles[i - 1].x, particles[i - 1].y
         )
-        draw_polugone(
-          particles[i].x, particles[i].y,
-          particles[i - 1].x, particles[i - 1].y
-        )
+        if ($(window).width() > 768)
+          draw_polugone(
+            particles[i].x, particles[i].y,
+            particles[i - 1].x, particles[i - 1].y
+          )
       }
-      for (i = 0; i < particles.length; i++) {
-        draw_line(
-          particles[i].x, particles[i].y,
-          particles[i].x, h
-        )
-      }
-      window.requestAnimationFrame(loop)
+      if ($(window).width() > 768)
+        for (i = 0; i < particles.length; i++) {
+          draw_line(
+            particles[i].x, particles[i].y,
+            particles[i].x, h
+          )
+        }
+      animate_graph = requestAnimationFrame(loop)
     };
     $(document).on('mousemove', 'canvas', function (e) {
       x_c = e.clientX - $(this).offset().left
       y_c = e.clientY - $(this).offset().top + $(document).scrollTop()
+      console.log('aaa')
+      setup()
     })
+    $(window).resize(setup)
     setup();
   }
   polugone_move_on_mouse = function () {
@@ -935,13 +961,13 @@ animate = function () {
   bubbles_move_mouse = function () {
     var opts = {
       time_life: 300,//ms
-      time_out : 200,//ms
+      time_out: 200,//ms
       radius: 10,
       first_opacity: 0.5,
-      interval_create: 10,
+      interval_create: 2,
       lenght_create: 5
     },
-    scroll_top = 0,
+      scroll_top = 0,
       mouse = {
         x: -500, y: -500
       },
@@ -960,11 +986,11 @@ animate = function () {
           this.obj.css('width', this.radius * 2)
           this.obj.css('height', this.radius * 2)
           this.obj.css('opacity', this.opacity)
-          this.obj.css('top', this.y - this.radius)
+          this.obj.css('top', this.y + 1/* - this.radius */)
           this.obj.css('left', this.x - this.radius)
+          this.hide()
         }
         this.hide = function () {
-          this.show()
           var item = this;
           this.obj.animate({
             opacity: 0,
@@ -993,13 +1019,16 @@ animate = function () {
     var tick_bubb = function () {
       if (item_create && !hover_a) {
         $('.mouse_fig').append('<div id="it' + index_item + '" class="fig"></div>')
-        bubbles.push(new bubble(mouse.x, mouse.y+scroll_top, $('#it' + index_item)))
+        bubbles.push(new bubble(mouse.x, mouse.y + scroll_top, $('#it' + index_item)))
         index_item++
         bubbles.forEach(function (item) {
           if (!item.start_death) {
             setTimeout(() => {
-              if(Math.sqrt((item.x-mouse.x)*(item.x-mouse.x)+(item.y-mouse.y-scroll_top)*(item.y-mouse.y-scroll_top))>opts.lenght_create)
-                  item.hide()
+              if (Math.sqrt((item.x - mouse.x) * (item.x - mouse.x) + (item.y - mouse.y - scroll_top) * (item.y - mouse.y - scroll_top)) > opts.lenght_create)
+                item.show()
+              else {
+                item.hide()
+              }
             }, opts.time_out);
             item.start_death = true;
           }
@@ -1029,8 +1058,7 @@ animate = function () {
 
   hex_sphere()
   polugone_move_on_mouse();
-  bubbles_move_mouse();
-  //paralax_polygon()
+  //bubbles_move_mouse();
 
   if ($('.graph').length > 0) graph();
 }
