@@ -1058,7 +1058,7 @@ animate = function () {
 
   hex_sphere()
   polugone_move_on_mouse();
-  //bubbles_move_mouse();
+  bubbles_move_mouse();
 
   if ($('.graph').length > 0) graph();
 }
