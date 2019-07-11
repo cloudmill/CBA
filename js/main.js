@@ -1,6 +1,6 @@
 $(document).ready(function () {
-  custom();
   sliders();
+  custom();
   animate();
 })
 custom = function () {
@@ -186,10 +186,147 @@ custom = function () {
       })
     })
   }
+  slider_move_on_mouse = function () {
+    var setintrv,
+      opts = {
+        curent_lenght: 200,
+        time_pause: 300,
+        but : {
+          forse: 1,
+          speed_free: 10,
+        }
+      }
+    mouse = {
+      x: 0, y: 0
+    },
+      items = [],
+      sliders_ar = [
+        $('.slider.one'),
+        $('.about-podhod .slider'),
+        $('.about-advantage .slider')
+      ],
+      item_t = function (slider) {
+        this.slider = slider;
+        this.height = slider.height();
+        this.y = slider.offset().top + slider.height();
+        this.but_set = function() {
+          this.obj= slider.parent().find('.but').eq(0),
+          this.width= slider.parent().find('.but').width(),
+          this.height= slider.parent().find('.but').height(),
+          this.x= 0,
+          this.y= 0,
+          this.dx= 0,
+          this.dy= 0,
+          this.speed_free= opts.but.speed_free,
+          this.forse= {
+            x: opts.but.forse,
+            y: opts.but.forse,
+          },
+          this.filling= {
+            x: 1, y: 1,
+          },
+          this.move= {
+            x: 0, y: 0
+          },
+          this.direction= 0,
+          this.free= true,
+          this.transform= '',
+          this.go= function (item,par) {
+            if (item.free) {
+              item.doing.free(item)
+            } else {
+              item.doing.mouse(item,par)
+            }
+          },
+          this.doing= {
+            mouse: function (item,par) {
+              item.set_filling(item,par)
+              item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
+              item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
+              item.moving(item)
+            },
+            free: function (item) {
+              item.set_direction(item,item.move.x, item.move.y)
+              item.dx = Math.cos(item.direction) / 100 * item.speed_free
+              item.dy = -Math.sin(item.direction) / 100 * item.speed_free
+              item.moving(item)
+              item.free = false;
+            }
+          },
+          this.moving= function (item) {
+            item.cur_position(item)
+            item.move.x += item.dx
+            item.move.y += item.dy
+            item.set_pos(item)
+          },
+          this.set_pos= function (item) {
+            item.transform = "translate(" + item.move.x + "px," + item.move.y + "px)";
+            item.obj.css('transform', item.transform)
+          },
+          this.cur_position= function (item) {
+            item.x = item.obj.offset().left + item.width / 2;
+            item.y = item.obj.offset().top + item.height / 2
+          },
+          this.set_direction= function (item, x, y) {
+            var gip = Math.sqrt(x * x + y * y)
+            var acos = -Math.acos(x / gip) + Math.PI
+            if (y < 0)
+              acos = Math.PI * 2 - acos
+            item.direction = acos
+          },
+          this.set_filling= function(item,par){
+            item.filling.y = round(1 - Math.abs((item.y - $(document).scrollTop() - mouse.y) / par.height/2), 3)
+            item.filling.x = round(1 - Math.abs((item.x - mouse.x) / $(window).width()/2), 3)
+          }
+        };
+        this.but = new this.but_set()
+        this.active = true;
+      }
+
+    sliders_ar.forEach(function (item) {
+      if (item.length > 0) {
+        items.push(new item_t(item))
+      }
+
+    })
+    items.forEach(function (item) {
+      item.slider.on('afterChange', function (event, slick, currentSlide, nextSlide) {
+        setTimeout(() => {
+          item.active = true;
+        }, opts.time_pause);
+      })
+    })
+    var ticks = function () {
+      items.forEach(function (item) {
+        item.height = item.slider.height()
+        item.y = item.height / 2 + item.slider.offset().top
+        if (Math.abs(mouse.y + $(document).scrollTop() - item.y) < item.height / 2 && item.active) {
+          if (mouse.x > $(window).width() / 2 + opts.curent_lenght) {
+            item.slider.slick('slickNext')
+            item.active = false
+          } else if (mouse.x < $(window).width() / 2 - opts.curent_lenght) {
+            item.slider.slick('slickPrev')
+            item.active = false
+          }
+          item.but.free = true;
+        } else item.but.free = false;
+        //item.but.go(item.but,item)
+      })
+    }
+    setintrv = setInterval(ticks, 10)
+    $(document).on('mousemove', function (e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    })
+  }
   questions_open();
   drop_down_init();
   short_text();
   forms();
+  $(document).ready(function () {
+    slider_move_on_mouse();
+  })
+
 
   if ($('input[name=phone]').length > 0) {
     $('input[name=phone]').mask("+7 (999) 99-99-999");
@@ -282,7 +419,16 @@ sliders = function () {
       speed: 1000,
       swipe: false,
       vertical: true,
-      infinite: false
+      infinite: false,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            vertical: false,
+            adaptiveHeight: true,
+          }
+        }
+      ]
     })
     $('.license-opportun .slider.one').slick({
       slidesToShow: 1,
@@ -353,13 +499,13 @@ sliders = function () {
     })
     $('.project-recomendation .left .slider').on('init', function () {
       var i = 0;
-      $('.project-recomendation .left .slider .slick-slide').each(function () {
+      $('.project-recomendation .left .slider .slick-slide:not(.slick-cloned)').each(function () {
         if (/* !$(this).hasClass('slick-cloned') */1) {
           if (i == 0) {
             $(this).find('.item').addClass('current')
           } else if (i == 1) {
             $(this).find('.item').addClass('next')
-          } else if (1 == 2) {
+          } else if (i == 2) {
             $(this).find('.item').addClass('next-next')
           }
           i++;
@@ -592,7 +738,6 @@ animate = function () {
     setup();
   }
   polugone_move_on_mouse = function () {
-    $('body').append('<div class="figures_click"></div>')
     var items = [],
       scroll_top = 0,
       figures_on_click = 0,
@@ -750,12 +895,12 @@ animate = function () {
         }
       }, opts.time_clear_mouse)
     })
-    $(document).on('mousedown', function () {
+    /* $(document).on('mousedown', function () {
       key_press = true;
     })
     $(document).on('mouseup', function () {
       key_press = false
-    })
+    }) */
 
     /* $(document).on('click',function(e){
       if(figures_on_click < 4){
@@ -957,7 +1102,6 @@ animate = function () {
     $("#container").append(renderer.domElement);
     setup()
   };
-  ;
   bubbles_move_mouse = function () {
     var opts = {
       time_life: 300,//ms
@@ -1054,12 +1198,10 @@ animate = function () {
     $(document).on('scroll', function () {
       scroll_top = $(this).scrollTop();
     })
-  }
-
+  };
   hex_sphere()
   polugone_move_on_mouse();
-  bubbles_move_mouse();
-
+  if ($(window).width() > 768) bubbles_move_mouse();
   if ($('.graph').length > 0) graph();
 }
 
