@@ -4,7 +4,6 @@ $(document).ready(function () {
   animate();
 })
 custom = function () {
-
   short_text = function () {
     $('.cases .item').each(function () {
       var text_temp = $(this).find('p.two').text(),
@@ -144,6 +143,13 @@ custom = function () {
         return false;
       }
     })
+    if ($('input[name=phone]').length > 0) {
+      $('input[name=phone]').mask("+7 (999) 99-99-999");
+    }
+    function mail_right(email) {
+      var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return pattern.test(String(email).toLowerCase());
+    }
   }
   questions_open = function () {
     $('.license-quest .block .item.active').each(function () {
@@ -186,14 +192,16 @@ custom = function () {
       })
     })
   }
-  slider_move_on_mouse = function () {
+  slider_move_on_mouse = function () {//переключение слайдера наведением курсора
     var setintrv,
       opts = {
         curent_lenght: 200,
         time_pause: 300,
-        but : {
-          forse: 1,
-          speed_free: 10,
+        but: {
+          lenght_move: {//смещение кнопки слайдера
+            x: 100,
+            y: 50
+          }
         }
       }
     mouse = {
@@ -209,74 +217,50 @@ custom = function () {
         this.slider = slider;
         this.height = slider.height();
         this.y = slider.offset().top + slider.height();
-        this.but_set = function() {
-          this.obj= slider.parent().find('.but').eq(0),
-          this.width= slider.parent().find('.but').width(),
-          this.height= slider.parent().find('.but').height(),
-          this.x= 0,
-          this.y= 0,
-          this.dx= 0,
-          this.dy= 0,
-          this.speed_free= opts.but.speed_free,
-          this.forse= {
-            x: opts.but.forse,
-            y: opts.but.forse,
-          },
-          this.filling= {
-            x: 1, y: 1,
-          },
-          this.move= {
+        this.but_set = function () {
+          this.obj = slider.parent().find('.but').eq(0)
+          this.height = slider.height()
+          this.move = {
             x: 0, y: 0
-          },
-          this.direction= 0,
-          this.free= true,
-          this.transform= '',
-          this.go= function (item,par) {
+          }
+          this.lenght_move = {
+            x: opts.but.lenght_move.x,
+            y: opts.but.lenght_move.y
+          }
+          this.y = slider.offset().top
+          this.direction = 0;
+          this.time_a = 0.1;
+          this.free = true;
+          this.transform = ''
+          this.go = function (item) {
             if (item.free) {
               item.doing.free(item)
             } else {
-              item.doing.mouse(item,par)
+              item.doing.mouse(item)
             }
-          },
-          this.doing= {
-            mouse: function (item,par) {
-              item.set_filling(item,par)
-              item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
-              item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
+          }
+          this.doing = {
+            mouse: function (item) {
+              item.move.x = -item.lenght_move.x * ($(window).width() / 2 - mouse.x) / ($(window).width() / 2)
+              item.move.y = -item.height / 3 * (item.height / 2 + item.y - ($(document).scrollTop() + mouse.y)) / (item.height / 2)
+              item.time_a = 0.2;
               item.moving(item)
             },
             free: function (item) {
-              item.set_direction(item,item.move.x, item.move.y)
-              item.dx = Math.cos(item.direction) / 100 * item.speed_free
-              item.dy = -Math.sin(item.direction) / 100 * item.speed_free
+              item.move.x = 0
+              item.move.y = 0
+              item.time_a = 0.5;
               item.moving(item)
               item.free = false;
             }
-          },
-          this.moving= function (item) {
-            item.cur_position(item)
-            item.move.x += item.dx
-            item.move.y += item.dy
+          }
+          this.moving = function (item) {
             item.set_pos(item)
-          },
-          this.set_pos= function (item) {
+          }
+          this.set_pos = function (item) {
+            item.obj.css('transition', 'all ' + item.time_a)
             item.transform = "translate(" + item.move.x + "px," + item.move.y + "px)";
             item.obj.css('transform', item.transform)
-          },
-          this.cur_position= function (item) {
-            item.x = item.obj.offset().left + item.width / 2;
-            item.y = item.obj.offset().top + item.height / 2
-          },
-          this.set_direction= function (item, x, y) {
-            var gip = Math.sqrt(x * x + y * y)
-            var acos = -Math.acos(x / gip) + Math.PI
-            if (y < 0)
-              acos = Math.PI * 2 - acos
-            item.direction = acos
-          },
-          this.set_filling= function(item,par){
-            item.filling.y = round(1 - Math.abs((item.y - $(document).scrollTop() - mouse.y) / par.height/2), 3)
-            item.filling.x = round(1 - Math.abs((item.x - mouse.x) / $(window).width()/2), 3)
           }
         };
         this.but = new this.but_set()
@@ -287,7 +271,6 @@ custom = function () {
       if (item.length > 0) {
         items.push(new item_t(item))
       }
-
     })
     items.forEach(function (item) {
       item.slider.on('afterChange', function (event, slick, currentSlide, nextSlide) {
@@ -300,17 +283,20 @@ custom = function () {
       items.forEach(function (item) {
         item.height = item.slider.height()
         item.y = item.height / 2 + item.slider.offset().top
-        if (Math.abs(mouse.y + $(document).scrollTop() - item.y) < item.height / 2 && item.active) {
-          if (mouse.x > $(window).width() / 2 + opts.curent_lenght) {
-            item.slider.slick('slickNext')
-            item.active = false
-          } else if (mouse.x < $(window).width() / 2 - opts.curent_lenght) {
-            item.slider.slick('slickPrev')
-            item.active = false
+        if (Math.abs(mouse.y + $(document).scrollTop() - item.y) < item.height / 2) {
+          if (item.active) {
+            if (mouse.x > $(window).width() / 2 + opts.curent_lenght) {
+              item.slider.slick('slickNext')
+              item.active = false
+            } else if (mouse.x < $(window).width() / 2 - opts.curent_lenght) {
+              item.slider.slick('slickPrev')
+              item.active = false
+            }
           }
-          item.but.free = true;
-        } else item.but.free = false;
-        //item.but.go(item.but,item)
+          item.but.free = false;
+        } else item.but.free = true;
+        item.but.y = item.slider.offset().top;
+        item.but.go(item.but)
       })
     }
     setintrv = setInterval(ticks, 10)
@@ -323,18 +309,7 @@ custom = function () {
   drop_down_init();
   short_text();
   forms();
-  $(document).ready(function () {
-    slider_move_on_mouse();
-  })
-
-
-  if ($('input[name=phone]').length > 0) {
-    $('input[name=phone]').mask("+7 (999) 99-99-999");
-  }
-  function mail_right(email) {
-    var pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return pattern.test(String(email).toLowerCase());
-  }
+  slider_move_on_mouse();
 };
 sliders = function () {
   sliders_init = function () {
@@ -584,7 +559,6 @@ sliders = function () {
       })
     })
   }
-
   sliders_init_before();
   sliders_init();
   sliders_init_after();
@@ -610,21 +584,25 @@ animate = function () {
       correct_bot,
       gradient,
       particles,
-      opts = {
-        object: {
-          radius_big: 15,
-          opacity_big: 0.2,
-          radius_small: 4.5,
-          stroke_width: 0.5,
-          color: '#45e3f1',
-          color_big: 'rgba(69, 227, 241,0.2)',
-          step: 1,
-          background: 'linear-gradient(to top,  0%, rgba(69, 227, 241, 0) 1%,  100%)',
-        },
-        canvas: {
-          bgc: "#fff",
-        }
-      };
+      mouse = { x: 0, y: 0 }
+    opts = {
+      object: {
+        radius_big: 15,
+        opacity_big: 0.2,
+        radius_small: 4.5,
+        stroke_width: 0.5,
+        color: '#45e3f1',
+        color_big: 'rgba(69, 227, 241,0.2)',
+        step: 1,
+        lenght_cursive_line: 0,
+        background: 'linear-gradient(to top,  0%, rgba(69, 227, 241, 0) 1%,  100%)',
+        k_lenght_fill: 1,
+        add_lenght_fill: 50,
+      },
+      canvas: {
+        bgc: "#fff",
+      }
+    };
     function set_values() {
       canvasBody.width = $('.graph').width();
       canvasBody.height = (30 + $('.graph ul.rows').height());
@@ -652,44 +630,138 @@ animate = function () {
     var particle = function (x, y) {
       this.x = x;
       this.y = y;
+      this.state_x = x;
+      this.state_y = y;
+      this.dx = 0;
+      this.dy = 0;
+      this.radius = opts.object.radius_big;
+      this.radius_small = opts.object.radius_small
+      this.direction = 0;
+      this.lenght_move = 0;
+      this.radius_move = 50
+      this.going_lenght = 0;
+      this.filling = {
+        x: 0, y: 0
+      }
+      this.forse = {
+        x: 1, y: 1
+      }
       this.draw_small = function () {
         canvas.beginPath();
-        canvas.arc(this.x, this.y, opts.object.radius_small, 0, Math.PI * 2)
+        canvas.arc(this.x, this.y, this.radius_small, 0, Math.PI * 2)
         canvas.closePath();
         canvas.fillStyle = opts.object.color;
         canvas.fill();
       }
       this.draw_big = function () {
         canvas.beginPath();
-        canvas.arc(this.x, this.y, opts.object.radius_big, 0, Math.PI * 2)
+        canvas.arc(this.x, this.y, this.radius, 0, Math.PI * 2)
         canvas.closePath();
         canvas.fillStyle = opts.object.color_big;
         canvas.fill();
       }
-    }
-    var draw_line = function (x1, y1, x2, y2) {
-      canvas.beginPath();
-      canvas.moveTo(x1, y1);
-      canvas.lineTo(x2, y2);
-      canvas.closePath();
-      canvas.strokeStyle = opts.object.color;
-      canvas.lineWidth = opts.object.stroke_width;
-      canvas.stroke();
-    }
-    var draw_polugone = function (x1, y1, x2, y2) {
-      canvas.beginPath();
-      canvas.moveTo(x1, y1);
-      canvas.lineTo(x2, y2);
-      canvas.lineTo(x2, h);
-      canvas.lineTo(x1, h);
-      canvas.closePath();
+      this.move_to = {
+        mouse: function (item) {
+          item.dx = item.filling.x * -Math.cos(item.direction) * item.forse.x
+          item.dy = item.filling.y * Math.sin(item.direction) * item.forse.y
+          item.moving()
+        },
+        go_home: function (item) {
+          item.set_direction(item.x - item.state_x, item.y - item.state_y)
+          item.lenght_move = Math.sqrt((item.x - item.state_x) * (item.x - item.state_x) + (item.y - item.state_y) * (item.y - item.state_y))
+          item.dx = Math.cos(item.direction) / 10 * item.lenght_move
+          item.dy = -Math.sin(item.direction) / 10 * item.lenght_move
+          if (Math.abs(item.x - item.state_x) > 1 || Math.abs(item.y - item.state_y) > 1) {
+            item.moving()
+          }
+        },
+      }
+      this.hover = function () {
+        if (Math.abs(this.x - mouse.x) < (this.radius * 2 * opts.object.k_lenght_fill - this.radius + opts.object.add_lenght_fill)
+          && Math.abs(this.y - mouse.y) < (this.radius * 2 * opts.object.k_lenght_fill - this.radius + opts.object.add_lenght_fill)) {
+          this.move_to.mouse(this)
+        } else {
+          this.move_to.go_home(this)
+        }
+      }
+      this.moving = function () {
+        this.filling_set()
+        this.border()
+      }
+      this.border = function () {
+        if (this.x + this.dx - this.radius > 0 && this.x + this.dx + this.radius < w) {
+          if (this.going_lenght < this.radius_move) {
+            this.x += this.dx
+          } else {
+            this.x += 0.1 * (this.x + this.dx - this.state_x > 0 ? -1 : 1)
+          }
+        } else if (this.x + this.dx + this.radius > w) {
+          this.x -= 0.1
+        } else {
+          this.x += 0.1
+        }
+        if (this.y + this.dy - this.radius > 0 && this.y + this.dy + this.radius < h) {
+          if (Math.sqrt((
+            this.y + this.dy - this.state_y)
+            * (this.y + this.dy - this.state_y)
+            + (this.x + this.dx - this.state_x)
+            * (this.x + this.dx - this.state_x))
+            < this.radius_move) {
+            this.y += this.dy
+          } else {
+            this.y += 0.1 * (this.y + this.dy - this.state_y > 0 ? -1 : 1)
+          }
+        } else if (this.y + this.dy + this.radius > h) {
+          this.y -= 0.1
+        } else {
+          this.y += 0.1
+        }
+      }
+      this.set_direction = function (x, y) {
+        var gip = Math.sqrt(x * x + y * y)
+        var acos = -Math.acos(x / gip) + Math.PI
+        if (y < 0)
+          acos = Math.PI * 2 - acos
+        this.direction = acos
+      }
+      this.filling_set = function () {
+        this.set_direction(this.x - mouse.x, this.y - mouse.y);
+        this.filling.y = round(1 - Math.abs((this.y - mouse.y) / (this.radius * 2 * opts.object.k_lenght_fill - this.radius + opts.object.add_lenght_fill)), 3)
+        this.filling.x = round(1 - Math.abs((this.x - mouse.x) / (this.radius * 2 * opts.object.k_lenght_fill - this.radius + opts.object.add_lenght_fill)), 3)
+        this.going_lenght = Math.sqrt((
+          this.y + this.dy - this.state_y)
+          * (this.y + this.dy - this.state_y)
+          + (this.x + this.dx - this.state_x)
+          * (this.x + this.dx - this.state_x)
+        )
 
-      gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
-      gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
-      canvas.fillStyle = gradient;
-      canvas.fill();
-
-    };
+      }
+    },
+      draw_line = function (x1, y1, x2, y2) {
+        var x3 = (x2 + x1) / 2,
+          y3 = (y2 + y1) / 2
+        canvas.beginPath();
+        canvas.moveTo(x1, y1);
+        canvas.quadraticCurveTo(x3, y3, x2, y2);
+        canvas.closePath();
+        canvas.strokeStyle = opts.object.color;
+        canvas.lineWidth = opts.object.stroke_width;
+        canvas.stroke();
+      },
+      draw_polugone = function (ar, bot_points) {
+        canvas.beginPath();
+        ar.forEach(function (item, i) {
+          if (i == 0) canvas.moveTo(item.x, item.y);
+          else canvas.lineTo(item.x, item.y);
+        })
+        canvas.lineTo(bot_points[0], h)
+        canvas.lineTo(bot_points[1], h)
+        canvas.closePath();
+        gradient.addColorStop(1, "rgba(69, 227, 241, 0)")
+        gradient.addColorStop(0, "rgba(31, 239, 217, 0.4)")
+        canvas.fillStyle = gradient;
+        canvas.fill();
+      };
     var animate_graph;
     function setup() {
       cancelAnimationFrame(animate_graph)
@@ -705,6 +777,7 @@ animate = function () {
       canvas.fillStyle = opts.canvas.bgc;
       canvas.fillRect(0, 0, w, h);
       for (i = 0; i < particles.length; i++) {
+        particles[i].hover()
         particles[i].draw_big()
         particles[i].draw_small();
       }
@@ -713,29 +786,39 @@ animate = function () {
           particles[i].x, particles[i].y,
           particles[i - 1].x, particles[i - 1].y
         )
-        if ($(window).width() > 768)
-          draw_polugone(
-            particles[i].x, particles[i].y,
-            particles[i - 1].x, particles[i - 1].y
-          )
       }
-      if ($(window).width() > 768)
-        for (i = 0; i < particles.length; i++) {
+      if ($(window).width() > 768) {
+        var ar = [];
+        particles.forEach(function (item) {
+          ar.push({ x: item.x, y: item.y })
           draw_line(
-            particles[i].x, particles[i].y,
-            particles[i].x, h
+            item.x, item.y,
+            item.state_x, h
           )
-        }
+        })
+        draw_polugone(ar, [particles[particles.length - 1].state_x, particles[0].state_x])
+      }
       animate_graph = requestAnimationFrame(loop)
     };
+    var clear_mouse;
     $(document).on('mousemove', 'canvas', function (e) {
-      x_c = e.clientX - $(this).offset().left
-      y_c = e.clientY - $(this).offset().top + $(document).scrollTop()
-      console.log('aaa')
-      setup()
+      clearTimeout(clear_mouse)
+      mouse.x = e.clientX - $(this).offset().left
+      mouse.y = e.clientY - $(this).offset().top + $(document).scrollTop()
+      clear_mouse = setTimeout(function () {
+        mouse.x = -100
+        mouse.y = -100
+      }, 1000)
     })
     $(window).resize(setup)
+    $(document).on('change', '.data-ar input', setup)
     setup();
+    shorted = function (a, b, l) {
+      return (Math.abs(a - b)) < l
+    }
+    round = function (num, step) {
+      return parseInt(num * Math.pow(10, step)) / Math.pow(10, step)
+    }
   }
   polugone_move_on_mouse = function () {
     var items = [],
@@ -1204,4 +1287,3 @@ animate = function () {
   if ($(window).width() > 768) bubbles_move_mouse();
   if ($('.graph').length > 0) graph();
 }
-
