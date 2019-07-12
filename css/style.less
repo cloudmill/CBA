@@ -6108,60 +6108,13 @@ a ,button{
     }
   }
 }
-.figures_click {
-  .figure_click {
-    position: absolute;
-    top: 0;
-    left: 0;
-    &:nth-child(6n) {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #d2ff70;
-    }
-    &:nth-child(6n-1) {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #71f6fc;
-    }
-    &:nth-child(6n-2) {
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-image: url(../images/polygon.svg);
-      width: 176px;
-      height: 202px;
-    }
-    &:nth-child(6n-3) {
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-image: url(../images/polygon.svg);
-      width: 122px;
-      height: 140px;
-    }
-    &:nth-child(6n-4) {
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-image: url(../images/polygon.svg);
-      width: 89px;
-      height: 102px;
-    }
-    &:nth-child(6n-5) {
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-image: url(../images/polygon.svg);
-      width: 63px;
-      height: 72px;
-    }
-  }
-}
-.mouse_fig {
-  .fig {
-    position: absolute;
-    z-index: 2;
-    border-radius: 50%;
-    background-color: #1fefd9;
-  }
+#bubble{
+  position: fixed;
+  left:0;
+  top:0;
+  user-select: none;
+  z-index: 1000;
+  pointer-events: none;
 }
 ///////////////////////////////
 
