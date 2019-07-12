@@ -3484,7 +3484,9 @@ a ,button{
         }
         .content {
           margin-top: 50px;
-          width: ~"calc(100% - 40px)";
+          @media (max-width: 1024px) {
+            width: ~"calc(100% - 40px)";
+          }
           .block {
             .narrow;
             margin-right: 0;

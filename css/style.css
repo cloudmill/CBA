@@ -12285,7 +12285,11 @@ button {
 }
 .wrapper section.about-podhod .content {
   margin-top: 50px;
-  width: calc(100% - 40px);
+}
+@media (max-width: 1024px) {
+  .wrapper section.about-podhod .content {
+    width: calc(100% - 40px);
+  }
 }
 .wrapper section.about-podhod .content .block {
   margin-left: 200px;
