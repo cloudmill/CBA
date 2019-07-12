@@ -745,11 +745,11 @@ animate = function() {
   var do_animate;
   anim_f = function(){
     do_animate = $(document).scrollTop() < $("#container").height();
-    if (do_animate) {
+   /*  if (do_animate) {
       $("body *").attr('style','');
     } else {
       $('body *').css('cursor','none')
-    }
+    } */
   }
   anim_f()
   $(document).on("scroll", function() {
