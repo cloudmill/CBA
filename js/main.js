@@ -464,6 +464,20 @@ custom = function () {
       $(this).parent().parent().find('.tab:not(' + target + ')').removeClass('active')
     })
   }
+  menu_hide_open = function(){
+    $(document).on('click','.burger_menu',function(e){
+      e.preventDefault()
+      $('.hide_menu').css('display','block')
+      if($('.hide_menu').hasClass('active')){
+        setTimeout(function(){
+          $('.hide_menu').hide()
+        },300)
+      }else $('.hide_menu').show()
+
+      $('.hide_menu').toggleClass('active')
+      $('header').toggleClass('active')
+    })
+  }
 
 
   go_to_block()
@@ -473,6 +487,7 @@ custom = function () {
   forms();
   slider_move_on_mouse();
   tabs();
+  menu_hide_open();
 };
 sliders = function () {
   sliders_init = function () {
