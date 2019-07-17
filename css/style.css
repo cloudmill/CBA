@@ -74,6 +74,17 @@ button {
 .wrapper header.active {
   background: #fff;
 }
+.wrapper header.active .content .right .burger_menu span {
+  background-color: transparent;
+}
+.wrapper header.active .content .right .burger_menu span:after {
+  transform: rotate(-45deg) translate(7px, -5px);
+  width: 27px;
+}
+.wrapper header.active .content .right .burger_menu span:before {
+  transform: rotate(45deg) translate(6px, 5px);
+  width: 27px;
+}
 @media (max-width: 768px) {
   .wrapper header {
     height: 50px;

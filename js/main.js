@@ -464,15 +464,15 @@ custom = function () {
       $(this).parent().parent().find('.tab:not(' + target + ')').removeClass('active')
     })
   }
-  menu_hide_open = function(){
-    $(document).on('click','.burger_menu',function(e){
+  menu_hide_open = function () {
+    $(document).on('click', '.burger_menu', function (e) {
       e.preventDefault()
-      $('.hide_menu').css('display','block')
-      if($('.hide_menu').hasClass('active')){
-        setTimeout(function(){
+      $('.hide_menu').css('display', 'block')
+      if ($('.hide_menu').hasClass('active')) {
+        setTimeout(function () {
           $('.hide_menu').hide()
-        },300)
-      }else $('.hide_menu').show()
+        }, 300)
+      } else $('.hide_menu').show()
 
       $('.hide_menu').toggleClass('active')
       $('header').toggleClass('active')
@@ -828,7 +828,7 @@ animate = function () {
           background:
             "linear-gradient(to top,  0%, rgba(69, 227, 241, 0) 1%,  100%)",
           k_lenght_fill: 1,
-          add_lenght_fill: 50
+          add_lenght_fill: 10
         },
         canvas: {
           bgc: "#fff"
@@ -867,8 +867,8 @@ animate = function () {
           y: 0
         };
         this.forse = {
-          x: 1,
-          y: 1
+          x: 2,
+          y: 2
         };
 
         this.draw_small = function () {
@@ -1400,7 +1400,9 @@ animate = function () {
       material_sphere,
       geometry_sphere,
       points_spheres,
-      createScene
+      createScene,
+      distanceVector,
+      distance
 
 
     var init_sphere = function () {
@@ -1413,6 +1415,7 @@ animate = function () {
       renderer.setClearColor(0xf5f5f5);
 
       cameraDistance = ($(window).width() < 551) ? 70 : 65;
+      distance = ($(window).width() < 551) ? 65 : 60;
       camera = new THREE.PerspectiveCamera(cameraDistance, width / height, 1, 200);
       camera.position.z = -cameraDistance;
 
@@ -1427,6 +1430,14 @@ animate = function () {
       projectionCanvas = document.createElement("canvas");
       projectionCanvas.width = width;
       projectionCanvas.height = height;
+
+      points_spheres = {
+        x: [],
+        y: [],
+        z: []
+      };
+
+      do_animate = $(document).scrollTop() < $("#container").height();
 
 
       center = function (x1, y1, z1, x2, y2, z2, req, d) {
@@ -1457,16 +1468,13 @@ animate = function () {
           }
         });
         return find;
-      }
-
-      points_spheres = {
-        x: [],
-        y: [],
-        z: []
       };
-
-      do_animate = $(document).scrollTop() < $("#container").height();
-
+      distanceVector = function (v1, v2) {
+        var dx = v1.x - v2.x;
+        var dy = v1.y - v2.y;
+        var dz = v1.z - v2.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+      };
       createScene = function (radius, divisions, tileSize, color, opacity) {
         while (scene.children.length > 0) {
           scene.remove(scene.children[0]);
@@ -1495,7 +1503,7 @@ animate = function () {
 
               var obj = new THREE.Mesh(geometry_sphere, material_sphere);
               obj.position.copy(new THREE.Vector3(bp.x, bp.y, bp.z));
-
+              obj.name = 'sphere'
               if ($(window).width() > 768)
                 scene.add(obj);
             }
@@ -1571,6 +1579,7 @@ animate = function () {
         }
         requestAnimationFrame(setup);
       };
+
       var tick = function () {
         var rotateCameraBy = (Math.PI / 100) * cameraAnglex;
         cameraAngle += rotateCameraBy;
@@ -1579,6 +1588,14 @@ animate = function () {
         camera.position.z = cameraDistance * Math.sin(cameraAngle);
         camera.lookAt(scene.position);
         renderer.render(scene, camera);
+
+        scene.children.forEach(function (item) {
+          if (distanceVector(camera.position, item.position) > distance && item.name == 'sphere') {
+            item.visible = false;
+          } else {
+            item.visible = true;
+          }
+        })
       };
       createScene(30, 8, 1, 0x54fbe9, 1);
 
