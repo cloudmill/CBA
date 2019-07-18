@@ -1896,7 +1896,7 @@ button {
   .wrapper section.cases .content .block.first_big .item:nth-child(9n - 3),
   .wrapper section.cases .content .block.first_big .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -4402,7 +4402,7 @@ button {
   .wrapper section.list_news_sub .content .list.first_big .item:nth-child(9n - 3),
   .wrapper section.list_news_sub .content .list.first_big .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -4757,7 +4757,7 @@ button {
   .wrapper section.list_news_sub .content .list .item:nth-child(9n - 3),
   .wrapper section.list_news_sub .content .list .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -5011,7 +5011,7 @@ button {
   .wrapper section.list_news .content .list.first_big .item:nth-child(9n - 3),
   .wrapper section.list_news .content .list.first_big .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -5366,7 +5366,7 @@ button {
   .wrapper section.list_news .content .list .item:nth-child(9n - 3),
   .wrapper section.list_news .content .list .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -6018,7 +6018,7 @@ button {
   .wrapper section.read_yet .content .list.first_big .item:nth-child(9n - 3),
   .wrapper section.read_yet .content .list.first_big .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {
@@ -16545,7 +16545,7 @@ button {
   .wrapper section .item_list.first_big .item:nth-child(9n - 3),
   .wrapper section .item_list.first_big .item:nth-child(9n - 2) {
     flex-basis: calc(((100% - 10px)/4)*2);
-    max-width: 485px;
+    max-width: 484px;
   }
 }
 @media (max-width: 1024px) and (min-width: 769px) {

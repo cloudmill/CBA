@@ -4,7 +4,6 @@ $(document).ready(function () {
   animate();
 });
 custom = function () {
-
   short_text = function () {
     $(".cases .item").each(function () {
       var text_temp = $(this)
@@ -1148,10 +1147,12 @@ animate = function () {
       start_anim,
       clear_mouse,
       shorted,
-      round
+      round,
+      objects
 
 
     var init = function () {
+      
       opts = {
         k_lenght_fill: 1, // коофициент дальньности взаимодействия от размера обьекта
         add_lenght_fill: 200, // дополнительная дальность взаимодействия
@@ -1336,10 +1337,12 @@ animate = function () {
 
         };
       };
-
-      $(".figure").each(function () {
-        items.push(new item($(this)));
-      });
+      
+      objects.forEach(function(it){
+        it.each(function () {
+          items.push(new item($(this)));
+        });
+      })
     }
     var setup = function () {
       function ticks() {
@@ -1355,12 +1358,10 @@ animate = function () {
           }
         });
       }
-
       start_anim = setInterval(ticks, 10);
 
       if ($(window).width() <= 768) {
         clearInterval(start_anim);
-        $(".figure").remove();
       }
     }
     var events = function () {
@@ -1380,6 +1381,10 @@ animate = function () {
       });
     }
 
+
+    objects = [
+      $(".figure")
+    ]
 
     init()
     setup()
@@ -1757,7 +1762,6 @@ animate = function () {
     events()
     setup()
   };
-
 
   hex_sphere();
   polugone_move_on_mouse();
