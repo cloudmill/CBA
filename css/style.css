@@ -16241,6 +16241,20 @@ button {
     flex-basis: 100%;
   }
 }
+.wrapper section.hide_menu .content .block .presentation a {
+  display: flex;
+  align-items: center;
+}
+.wrapper section.hide_menu .content .block .presentation a:before {
+  margin-right: 10px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content: "";
+  background-image: url(../images/download.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 .wrapper section.hide_menu .content .first {
   height: 130px;
 }
@@ -16336,6 +16350,56 @@ button {
 }
 .wrapper section.hide_menu.active {
   opacity: 1;
+}
+@media (max-width: 1024px) {
+  .wrapper section.hide_menu .content {
+    flex-wrap: nowrap;
+    flex-direction: row;
+  }
+}
+@media (max-width: 768px) {
+  .wrapper section.hide_menu .content {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+}
+.wrapper section.hide_menu .content .left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-basis: 70%;
+}
+@media (max-width: 1024px) {
+  .wrapper section.hide_menu .content .left {
+    flex-basis: 60%;
+  }
+}
+.wrapper section.hide_menu .content .left p:last-child {
+  margin-bottom: 0;
+}
+.wrapper section.hide_menu .content .block {
+  flex-basis: 30%;
+}
+@media (max-width: 1024px) {
+  .wrapper section.hide_menu .content .block {
+    flex-basis: 40%;
+  }
+}
+@media (max-width: 768px) {
+  .wrapper section.hide_menu .content .block {
+    border-top: 1px solid #e7e7e7;
+  }
+}
+.wrapper section.hide_menu .content .block .item {
+  margin-bottom: 30px;
+}
+.wrapper section.hide_menu .content .block .presentation {
+  margin-top: 120px;
+}
+@media (max-width: 768px) {
+  .wrapper section.hide_menu .content .block .presentation {
+    margin-top: 30px;
+  }
 }
 .wrapper section .big_first_section {
   min-height: 100vh;
@@ -18498,6 +18562,20 @@ button {
     flex-basis: 100%;
   }
 }
+.wrapper footer .content .block .presentation a {
+  display: flex;
+  align-items: center;
+}
+.wrapper footer .content .block .presentation a:before {
+  margin-right: 10px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content: "";
+  background-image: url(../images/download.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 .wrapper footer .content .first {
   height: 130px;
 }
@@ -18907,6 +18985,20 @@ button {
   .wrapper .footer .content .block .row p {
     flex-basis: 100%;
   }
+}
+.wrapper .footer .content .block .presentation a {
+  display: flex;
+  align-items: center;
+}
+.wrapper .footer .content .block .presentation a:before {
+  margin-right: 10px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  content: "";
+  background-image: url(../images/download.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 .wrapper .footer .content .first {
   height: 130px;
