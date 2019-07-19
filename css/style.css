@@ -12154,6 +12154,10 @@ button {
     height: 160px;
   }
 }
+.wrapper section.ambassador-achievement .content .slider-wrapper .slider .item .img img {
+  margin-left: 0;
+  margin-top: 0;
+}
 .wrapper section.ambassador-list .content {
   position: relative;
   z-index: 2;

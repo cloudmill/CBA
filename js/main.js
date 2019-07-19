@@ -1215,19 +1215,18 @@ animate = function () {
       round,
       objects
 
-
     var init = function () {
-
       opts = {
-        k_lenght_fill: 1, // коофициент дальньности взаимодействия от размера обьекта
-        add_lenght_fill: 200, // дополнительная дальность взаимодействия
-        start_forse: 3, // коофициент взаимодействия с курсором
-        time_clear_mouse: 2000, // время сброса кооднинат курсора (мс)
-        angle_step: Math.PI / 30, // угол поворота
+        k_lenght_fill: 1, // коофициент дальньности взаимодействия с курсором(зависит от размера обьекта взаимодействия)
+        add_lenght_fill: 200, // дополнительная дальность взаимодействия с курсором
+        start_forse: 3, // коофициент силы взаимодействия с курсором
+        time_clear_mouse: 2000, // время сброса коорднинат курсора (мс)
+        angle_step: Math.PI / 30, // угол поворота обьекта при свободном движении
         rotate_probability: 40, //% вероятность поворота при свободном движении
-        speed_free: 40, //скорость (пикесель в сек)
-        lenght_travel: 100, // растояние для начала двидения в изначальной точке
-        finish_home_from_travel: 10 //растояние прекращения возвращения
+        speed_free: 40, //скорость свободного движения (пикесель в сек)
+        lenght_travel: 100, // радиус свободного движения
+        finish_home_from_travel: 10, //растояние отмены возвращения в начальную точку при выходе из радиуса свободного движения
+        direction_mouse_filling: 1// направление взаимодействия обьекта с курсором от 0..1, где 1 от курсора, 0 к курсору
       }
       mouse = {
         x: 0,
@@ -1242,7 +1241,6 @@ animate = function () {
       round = function (num, step) {
         return parseInt(num * Math.pow(10, step)) / Math.pow(10, step);
       };
-
       item = function (obj, x, y) {
         this.x;
         this.y;
@@ -1370,23 +1368,23 @@ animate = function () {
             this.set_direction(this.x - mouse.x, this.y - scroll_top - mouse.y);
 
             this.filling.y = round(
-              1 - Math.abs(
+              opts.direction_mouse_filling - Math.abs(
                 (this.y - scroll_top - mouse.y) /
 
                 (this.height * opts.k_lenght_fill -
                   this.height / 2 +
                   opts.add_lenght_fill)
               ), 3
-            );
+            )
             this.filling.x = round(
-              1 - Math.abs(
+              opts.direction_mouse_filling - Math.abs(
                 (this.x - mouse.x) /
 
                 (this.width * opts.k_lenght_fill -
                   this.width / 2 +
                   opts.add_lenght_fill)
               ), 3
-            );
+            )
           } else this.hover = false;
         };
         this.check_travel_lenght = function () {
