@@ -1830,7 +1830,7 @@ animate = function () {
   polugone_move_on_mouse();
 
 
-  if ($(window).width() > 768) bubbles_move_mouse();
+  //if ($(window).width() > 768) bubbles_move_mouse();
 
   if ($(".graph").length > 0) graph();
 };

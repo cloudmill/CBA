@@ -5541,6 +5541,7 @@ button {
 }
 .wrapper section.about_sub .content .title:hover span:before {
   width: calc(100% + 129px);
+  height: 100%;
 }
 @media (max-width: 1024px) {
   .wrapper section.about_sub .content .title:hover span:before {
@@ -5584,6 +5585,8 @@ button {
   color: #46e7ee;
   font-family: Circe;
   font-size: 55px;
+  display: block;
+  max-width: 80%;
   font-weight: 700;
   position: relative;
 }
@@ -5627,7 +5630,7 @@ button {
   font-weight: 400;
   line-height: 24px;
   position: absolute;
-  top: -8px;
+  top: -12px;
   z-index: 3;
   left: 2px;
 }
@@ -5652,18 +5655,18 @@ button {
   width: 129px;
   height: 129px;
   background-color: #ffffff;
-  border-radius: 65px;
+  border-radius: 500px;
   left: 0;
   position: absolute;
   top: 50%;
-  transform: translate(-69px, -69px);
+  transform: translate(-69px, -50%);
   z-index: -1;
 }
 @media (max-width: 1024px) {
   .wrapper section.about_sub .content .title span:before {
     width: 69px;
     height: 69px;
-    transform: translate(-34px, -36px);
+    transform: translate(-34px, -50%);
   }
 }
 .wrapper section.about_sub .content p {
@@ -9148,6 +9151,10 @@ button {
     right: 50%;
   }
 }
+.wrapper section.project-slider .content .slider-wrapper .slider .slick-track {
+  display: flex;
+  align-items: center;
+}
 @media (max-width: 768px) {
   .wrapper section.project-slider .content .slider-wrapper .slider .item {
     padding-bottom: 0;
@@ -9401,6 +9408,7 @@ button {
   margin-bottom: 100px;
   margin-left: 200px;
   margin-right: 200px;
+  min-height: 120px;
   margin-right: 100px;
 }
 @media (max-width: 1300px) {
@@ -12651,6 +12659,7 @@ button {
 .wrapper section.about-first .content .block {
   margin-left: 200px;
   margin-right: 200px;
+  margin-right: 0!important;
   position: relative;
 }
 @media (max-width: 1300px) {
@@ -12699,6 +12708,7 @@ button {
   margin-left: 200px;
   margin-right: 200px;
   margin-right: 0 !important;
+  padding-left: 100px;
   color: #2f2f2f;
   font-family: Circe;
   font-size: 38px;
@@ -12742,6 +12752,7 @@ button {
   .wrapper section.about-first .content .block .text {
     font-size: 16px;
     margin-left: 80px;
+    padding-left: 50px;
   }
 }
 .wrapper section.about-podhod {
@@ -15980,7 +15991,7 @@ button {
 .wrapper section.hide_menu .content .left .dropdown-wrapper {
   height: 41px;
   margin-right: 10px;
-  max-width: 230px;
+  max-width: 300px;
   margin-top: 5px;
   position: relative;
 }
@@ -18302,7 +18313,7 @@ button {
 .wrapper footer .content .left .dropdown-wrapper {
   height: 41px;
   margin-right: 10px;
-  max-width: 230px;
+  max-width: 300px;
   margin-top: 5px;
   position: relative;
 }
@@ -19052,7 +19063,7 @@ button {
 .wrapper .footer .content .left .dropdown-wrapper {
   height: 41px;
   margin-right: 10px;
-  max-width: 230px;
+  max-width: 300px;
   margin-top: 5px;
   position: relative;
 }
