@@ -1897,7 +1897,7 @@ button {
               .col {
                 width: ~"calc(40% - 10px)";
                 .col_in {
-                  height: ~"calc(100% - 82px)";
+                  height: 254px;
                 }
                 &:last-child {
                   width: ~"calc(60% - 10px)";
@@ -2034,6 +2034,7 @@ button {
                     cursor: pointer;
                     position: relative;
                     transition: @anim;
+                    overflow: visible;
                     &.load {
                       border: 2px solid #d2ff70;
                       overflow: visible;
@@ -2043,6 +2044,9 @@ button {
                         top: 0;
                         right: 30px;
                       }
+                    }
+                    &.error{
+
                     }
                     input {
                       display: none;
@@ -2072,6 +2076,15 @@ button {
                       span.size {
                         margin-left: 10px;
                       }
+                    }
+                    span.error_text{
+                      position: absolute;
+                      top:100%;
+                      left:0;
+                      margin-top: 10px;
+                      color: red;
+                      font-family: Circe;
+                      font-size: 13px;
                     }
                   }
                   .inputs {
@@ -5961,11 +5974,13 @@ button {
     background-color: rgba(148, 255, 255,0.9);
     transition: @anim;
     opacity:0;
+    overflow: scroll;
     &.active{
       opacity:1;
     }
     .content{
       height: 100vh;
+      min-height: 800px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -5982,6 +5997,11 @@ button {
         }
         &.active{
           opacity:1
+        }
+        &#success{
+          .head{
+            margin-bottom: 0;
+          }
         }
         .head{
           color: #2f2f2f;
